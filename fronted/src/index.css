@@ -1,0 +1,176 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Geist:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-geist: "Geist", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+}
+
+:root {
+  --color-void-canvas: #0a0a0a;
+  --color-deep-navy: #07111f;
+  --color-midnight-blue: #0d1b31;
+  --color-graphite: #161616;
+  --color-frosted-glass: #d4d4d4;
+  --color-ink-black: #000000;
+  --color-snow-white: #ffffff;
+  --color-bone: #ededed;
+  --color-ash: #c2c2c2;
+  --color-slate: #686868;
+  --color-smoke: #b2b2b2;
+  --color-hairline: #e5e5e5;
+  --color-dusk-violet: #6b62f2;
+  --gradient-dusk-violet: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0),
+    rgba(0, 0, 0, 0) 40%,
+    rgba(107, 98, 242, 0.565) 50%,
+    rgba(0, 0, 0, 0) 60%,
+    rgba(0, 0, 0, 0)
+  );
+  --shadow-subtle: rgba(255, 255, 255, 0.1) 0 0 0 1px inset;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+  background: var(--color-void-canvas);
+  color: var(--color-bone);
+}
+
+body {
+  font-family: var(--font-sans);
+}
+
+* {
+  scrollbar-color: rgba(229, 229, 229, 0.35) rgba(255, 255, 255, 0.06);
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+*::-webkit-scrollbar-thumb {
+  background: rgba(229, 229, 229, 0.35);
+  border: 2px solid rgba(10, 10, 10, 0.9);
+  border-radius: 9999px;
+}
+
+@layer utilities {
+  .font-geist {
+    font-family: var(--font-geist);
+  }
+
+  .dimension-horizon {
+    background:
+      linear-gradient(115deg, rgba(229, 159, 91, 0.92) 0%, rgba(185, 91, 97, 0.86) 29%, rgba(27, 65, 139, 0.94) 62%, rgba(7, 17, 31, 0.98) 100%);
+  }
+
+  .dimension-navy-panel {
+    background:
+      radial-gradient(circle at 18% 0%, rgba(64, 98, 171, 0.22), transparent 34%),
+      linear-gradient(145deg, rgba(13, 27, 49, 0.92), rgba(17, 17, 18, 0.94));
+  }
+
+  .dimension-violet-wash {
+    background: var(--gradient-dusk-violet);
+  }
+
+  .proof-flow-line {
+    background:
+      linear-gradient(90deg, transparent, rgba(237, 237, 237, 0.16), transparent),
+      linear-gradient(90deg, rgba(229, 229, 229, 0.08), rgba(27, 65, 139, 0.45), rgba(229, 229, 229, 0.08));
+    background-size: 180px 100%, 100% 100%;
+    animation: proof-flow 5s linear infinite;
+  }
+
+  .demo-scanline {
+    background: linear-gradient(180deg, transparent, rgba(237, 237, 237, 0.16), transparent);
+    animation: demo-scan 4.8s ease-in-out infinite;
+  }
+
+  @keyframes proof-flow {
+    0% {
+      background-position: -180px 0, 0 0;
+    }
+    100% {
+      background-position: calc(100% + 180px) 0, 0 0;
+    }
+  }
+
+  @keyframes demo-scan {
+    0%, 100% {
+      transform: translateY(-120%);
+      opacity: 0;
+    }
+    30%, 70% {
+      opacity: 0.7;
+    }
+    50% {
+      transform: translateY(120%);
+      opacity: 0.3;
+    }
+  }
+
+  .dimension-frost {
+    background: rgba(212, 212, 212, 0.1);
+    border-color: rgba(229, 229, 229, 0.14);
+    box-shadow: var(--shadow-subtle);
+    backdrop-filter: blur(4px);
+  }
+
+  .bg-\[\#F4F8FF\],
+  .bg-\[\#F8FAFC\] {
+    background-color: var(--color-void-canvas) !important;
+  }
+
+  .bg-\[\#EEF5FF\],
+  .bg-\[\#E6F0FF\],
+  .bg-white,
+  .bg-white\/30,
+  .bg-white\/50,
+  .bg-white\/60,
+  .bg-white\/70,
+  .bg-white\/80,
+  .bg-white\/90 {
+    background-color: rgba(212, 212, 212, 0.1) !important;
+    backdrop-filter: blur(4px);
+  }
+
+  .border-\[\#DCE7F6\],
+  .border-\[\#F0F4F8\],
+  .border-white,
+  .border-white\/50,
+  .border-white\/60,
+  .border-white\/80 {
+    border-color: rgba(229, 229, 229, 0.14) !important;
+  }
+
+  .text-\[\#08142F\] {
+    color: var(--color-bone) !important;
+  }
+
+  .text-\[\#5F6F8C\],
+  .text-\[\#8A96AD\] {
+    color: var(--color-ash) !important;
+  }
+
+  .text-\[\#4A8DFF\],
+  .text-\[\#65D6FF\] {
+    color: var(--color-bone) !important;
+  }
+
+  .shadow-sm,
+  .shadow-md,
+  .shadow-lg,
+  .shadow-xl {
+    box-shadow: var(--shadow-subtle) !important;
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "name": "BaseFactory Demo",
+  "description": "Interactive demo for enterprise AI capability bases, trace feedback, quality gates, and reusable workflow assets.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
