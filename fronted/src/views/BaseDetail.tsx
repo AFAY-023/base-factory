@@ -68,7 +68,7 @@ export function BaseDetail({ onNavigate, onSelectRun }: { onNavigate: (view: Vie
             </Button>
             <Button
               className="bg-[#0d1b31] text-white border border-white/15 hover:bg-[#14345f] shadow-[0_0_0_1px_rgba(255,255,255,0.08)]"
-              onClick={() => { onSelectRun(mockData.sampleRun.runId); onNavigate('runDetail'); }}
+              onClick={() => onNavigate('newRun')}
             >
               <PlayCircle className="w-4 h-4 mr-2" />
               {t('Start New Run', '启动新运行')}
@@ -176,35 +176,41 @@ function OverviewTab({ base }: { base: BusinessBase }) {
 function ConfigureTab() {
   const { lang, t } = useTranslation();
   const mockData = getMockData(lang);
+  const { baseProfile } = mockData;
   
   return (
     <div className="space-y-10">
       <section>
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-[#08142F] flex items-center gap-2">
-            <Database className="w-5 h-5 text-[#4A8DFF]" /> {t('Knowledge Sources', '知识库源')}
+            <Database className="w-5 h-5 text-[#0d1b31]" /> {t('Base Context', '基座上下文')}
           </h3>
-          <Button variant="outline" size="sm">{t('Connect Source', '连接数据源')}</Button>
+          <Badge variant="success">DTC workspace</Badge>
         </div>
-        <div className="grid grid-cols-2 gap-4">
-          <Card className="p-5 flex items-start gap-4">
-            <div className="w-10 h-10 rounded-lg bg-[#EEF5FF] flex items-center justify-center shrink-0">
-              <Database className="w-5 h-5 text-[#4A8DFF]" />
-            </div>
-            <div>
-              <h4 className="font-medium text-[#08142F]">{t('Corporate UI Guidelines', '企业 UI 规范')}</h4>
-              <p className="text-sm text-[#5F6F8C] mt-1">{t('Vector DB • Indexed 2 hours ago', '向量库 • 2小时前索引')}</p>
-            </div>
-          </Card>
-          <Card className="p-5 flex items-start gap-4">
-            <div className="w-10 h-10 rounded-lg bg-[#EEF5FF] flex items-center justify-center shrink-0">
-              <FileBox className="w-5 h-5 text-[#4A8DFF]" />
-            </div>
-            <div>
-              <h4 className="font-medium text-[#08142F]">{t('Historical PRDs', '历史 PRD 文档')}</h4>
-              <p className="text-sm text-[#5F6F8C] mt-1">{t('Confluence Integration • Sync Active', 'Confluence 集成 • 同步中')}</p>
-            </div>
-          </Card>
+        <Card className="p-5 mb-4 bg-[#0d1b31] border-white/10">
+          <div className="text-xs uppercase tracking-wider text-[#9eb0c9] mb-2">{t('Business Constitution', '业务宪章')}</div>
+          <p className="text-sm leading-relaxed text-white">{baseProfile.constitution}</p>
+        </Card>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {baseProfile.knowledgeSources.map((source) => (
+            <Card key={source.id} className="p-5 flex items-start gap-4">
+              <div className="w-10 h-10 rounded-lg bg-[#0d1b31] flex items-center justify-center shrink-0">
+                {source.type === 'prd' ? <FileBox className="w-5 h-5 text-white" /> : <Database className="w-5 h-5 text-white" />}
+              </div>
+              <div className="min-w-0">
+                <div className="flex items-center gap-2"><h4 className="font-medium text-[#08142F]">{source.name}</h4><Badge variant="outline" className="text-[10px] py-0 px-1.5 h-4">{source.type}</Badge></div>
+                <p className="text-sm text-[#5F6F8C] mt-1 leading-relaxed">{source.description}</p>
+                <div className="mt-3 flex gap-1.5 flex-wrap">{source.tags.map((tag) => <span key={tag} className="text-[10px] rounded bg-[#EEF5FF] px-2 py-0.5 text-[#5F6F8C]">{tag}</span>)}</div>
+              </div>
+            </Card>
+          ))}
+        </div>
+      </section>
+
+      <section>
+        <h3 className="text-lg font-semibold text-[#08142F] flex items-center gap-2 mb-4"><LayoutGrid className="w-5 h-5 text-[#0d1b31]" /> {t('Requirement Routing', '需求路由')}</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          {baseProfile.requirementTypes.map((type) => <Card key={type.id} className="p-4"><div className="font-medium text-[#08142F] text-sm">{type.label}</div><p className="text-xs leading-relaxed text-[#5F6F8C] mt-1">{type.description}</p></Card>)}
         </div>
       </section>
 

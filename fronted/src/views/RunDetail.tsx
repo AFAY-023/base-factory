@@ -1,413 +1,205 @@
 import React, { useState } from 'react';
-import { ViewState, RunStep } from '../types';
+import {
+  Activity,
+  ArrowLeft,
+  Check,
+  CheckCircle2,
+  ChevronRight,
+  ClipboardCheck,
+  Code2,
+  FileText,
+  GitPullRequest,
+  Send,
+  ShieldCheck,
+  Sparkles,
+  UserRound,
+} from 'lucide-react';
 import { getMockData } from '../data/mock';
 import { useTranslation } from '../lib/i18n';
-import { Button, Card, Badge } from '../components/ui';
-import { ArrowLeft, CheckCircle, FileText, Code, ShieldAlert, Activity, ArrowRight, MessageSquare, Play, Sparkles, CheckSquare, Search, LayoutGrid } from 'lucide-react';
+import { approveImprovementProposal, submitRunPrompt } from '../lib/runFlow';
+import { RunDraft, RunMessage, ViewState } from '../types';
+import { Badge, Button, Card } from '../components/ui';
 
-export function RunDetail({ onNavigate }: { onNavigate: (view: ViewState) => void }) {
-  const [activeTab, setActiveTab] = useState<'prd' | 'prototype' | 'check' | 'trace'>('prd');
+type ArtifactTab = 'prd' | 'prototype' | 'check' | 'trace';
+
+export function RunDetail({ onNavigate, run }: { onNavigate: (view: ViewState) => void; run: RunDraft | null }) {
   const { lang, t } = useTranslation();
-  const mockData = getMockData(lang);
-  const { sampleRun, traceEvents } = mockData;
+  const { sampleRun, traceEvents, artifactSnapshots, baseProfile, improvementProposal, skills } = getMockData(lang);
+  const [activeTab, setActiveTab] = useState<ArtifactTab>('prd');
+  const [proposal, setProposal] = useState(improvementProposal);
+  const [messages, setMessages] = useState<RunMessage[]>(() => run?.messages?.length ? run.messages : getInitialConversation(lang === 'zh'));
+  const [messageDraft, setMessageDraft] = useState('');
+  const isZh = lang === 'zh';
+  const runTitle = run?.title || sampleRun.title;
+  const sourceIds = run?.selectedSourceIds ?? ['constitution', 'prd-us-membership'];
+  const sources = baseProfile.knowledgeSources.filter((source) => sourceIds.includes(source.id));
+
+  const sendMessage = () => {
+    if (!messageDraft.trim()) return;
+    setMessages((current) => submitRunPrompt(current, messageDraft, lang));
+    setMessageDraft('');
+  };
 
   return (
-    <div className="min-h-screen bg-[#07111f] flex flex-col font-sans relative">
-      <div className="absolute inset-x-0 top-0 h-48 bg-gradient-to-b from-[#0d1b31] to-transparent opacity-70 pointer-events-none" />
-
-      <header className="h-16 bg-[#0a0a0a]/80 backdrop-blur-md border-b border-white/10 flex items-center px-6 justify-between shrink-0 z-10 shadow-sm">
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="sm" onClick={() => onNavigate('baseDetail')} className="px-2">
-            <ArrowLeft className="w-4 h-4" />
-          </Button>
-          <div>
-            <div className="text-[10px] text-[#5F6F8C] uppercase tracking-wider font-semibold mb-0.5">{t('Product Work Base / Active Run', '产品工作基座 / 活跃运行')}</div>
-            <h1 className="font-semibold text-lg text-[#08142F]">{sampleRun.title}</h1>
+    <div className="min-h-screen bg-[#0b0d10] font-sans text-white">
+      <header className="sticky top-0 z-40 border-b border-white/10 bg-[#202124]">
+        <div className="flex h-16 items-center justify-between gap-3 px-4 md:px-7">
+          <div className="flex min-w-0 items-center gap-3">
+            <Button variant="ghost" size="sm" aria-label={t('Back to base', '返回 Base')} className="h-9 w-9 shrink-0 p-0 text-white hover:bg-white/10" onClick={() => onNavigate('baseDetail')}>
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
+            <div className="min-w-0">
+              <div className="truncate text-[10px] font-semibold uppercase tracking-[0.12em] text-white/50">Product Work Base / Active Run</div>
+              <h1 className="truncate text-base font-semibold text-white md:text-lg">{runTitle}</h1>
+            </div>
           </div>
-        </div>
-        <div className="flex items-center gap-3">
-          <Button
-            variant="outline"
-            size="sm"
-            className="bg-[#0d1b31]/85 text-[#ededed] border-white/15 hover:bg-[#14345f]"
-            onClick={() => onNavigate('landing')}
-          >
-            {t('Home', '首页')}
-          </Button>
-          <Badge variant="outline" className="bg-white">{t('Iteration 3', '第 3 次迭代')}</Badge>
-          <Badge variant="warning">{sampleRun.status}</Badge>
+          <div className="flex shrink-0 items-center gap-2">
+            <Badge className="hidden border-white/10 bg-white/10 text-white/70 sm:inline-flex">{isZh ? '迭代 1' : 'Iteration 1'}</Badge>
+            <Badge className="border-amber-300/20 bg-amber-300/10 text-amber-100">{isZh ? '持续优化' : 'Improving'}</Badge>
+          </div>
         </div>
       </header>
 
-      <div className="flex-1 flex overflow-hidden z-10">
-        {/* Left Pane: Chat / Conversation */}
-        <div className="w-[450px] border-r border-white/10 bg-[#0a0a0a]/55 backdrop-blur-md flex flex-col shrink-0 shadow-[4px_0_24px_rgba(0,0,0,0.02)]">
-          <div className="p-4 border-b border-white/10 flex items-center gap-2 bg-[#0d1b31]/55">
-            <Sparkles className="w-4 h-4 text-[#ededed]" />
-            <span className="font-semibold text-sm text-[#08142F]">{t('Base Agent', '基座智能体')}</span>
+      <main className="grid min-h-[calc(100vh-64px)] grid-cols-1 lg:grid-cols-[minmax(360px,40%)_minmax(0,1fr)]">
+        <section className="flex min-h-[640px] flex-col border-b border-white/10 bg-[#181a1d] lg:min-h-0 lg:border-b-0 lg:border-r">
+          <div className="flex items-center justify-between border-b border-white/10 bg-[#3a3a3a] px-5 py-4">
+            <div className="flex items-center gap-2 text-sm font-semibold text-white"><Sparkles className="h-4 w-4 text-emerald-400" />{isZh ? 'Base Agent' : 'Base Agent'}</div>
+            <span className="text-[11px] text-white/45">{sources.length} {isZh ? '条上下文已命中' : 'sources matched'}</span>
           </div>
-          <div className="flex-1 overflow-auto p-5 space-y-6">
-            <ChatMessage 
-              role="user" 
-              time="10:00 AM"
-              content={t(
-                "The business team wants to generate a personalized business workspace for different roles, allowing employees to see their to-dos, key metrics, quick links, risk alerts, and recent records.",
-                "业务团队希望为不同角色生成个性化的业务工作台，让员工能够看到自己的待办事项、核心指标、快捷入口、风险预警以及近期操作记录。"
-              )}
-            />
-            <ChatMessage 
-              role="agent" 
-              time="10:01 AM"
-              content={t(
-                "I've generated a draft PRD for the Workspace based on your request. I noticed a few ambiguities: What specific data sources are required for the metric cards?",
-                "我已根据要求生成了工作台的 PRD 草稿。但我发现几个不明确的地方：指标卡片需要哪些具体的数据源？"
-              )}
-            />
-            <ChatMessage 
-              role="user" 
-              time="10:05 AM"
-              content={t(
-                "All metric cards must explicitly display their data source and refresh frequency (e.g., 'Real-time', 'Hourly').",
-                "所有指标卡片必须明确显示数据源和刷新频率（例如：“实时”、“每小时”）。"
-              )}
-            />
-            
-            <div className="flex items-center gap-2 my-2 opacity-80">
-              <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
-              <div className="text-[10px] uppercase font-bold tracking-widest text-[#c2c2c2] flex items-center gap-1">
-                <Activity className="w-3 h-3" /> {t('Trace Captured', '追踪已捕获')}
+
+          <div className="flex-1 space-y-4 overflow-y-auto px-5 py-5 lg:max-h-[calc(100vh-204px)]">
+            {messages.map((message, index) => (
+              <React.Fragment key={message.id}>
+                {index === 3 && <TraceDivider isZh={isZh} />}
+                <ChatMessage message={message} isZh={isZh} />
+              </React.Fragment>
+            ))}
+          </div>
+
+          <div className="border-t border-white/10 bg-[#15171a] p-4">
+            <div className="flex items-end gap-2 rounded-lg border border-white/10 bg-[#23262a] p-2 focus-within:border-emerald-400/45">
+              <textarea
+                aria-label={isZh ? '向 Base Agent 发送消息' : 'Message Base Agent'}
+                value={messageDraft}
+                onChange={(event) => setMessageDraft(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter' && !event.shiftKey) {
+                    event.preventDefault();
+                    sendMessage();
+                  }
+                }}
+                placeholder={isZh ? '补充需求、规则或验收条件...' : 'Add a requirement, rule, or acceptance criterion...'}
+                rows={2}
+                className="min-h-11 flex-1 resize-none bg-transparent px-2 py-1.5 text-sm text-white outline-none placeholder:text-white/35"
+              />
+              <button type="button" aria-label={isZh ? '发送消息' : 'Send message'} onClick={sendMessage} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-emerald-400 text-[#10211d] transition-colors hover:bg-emerald-300">
+                <Send className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <section className="min-w-0 bg-[#0b0d10]">
+          <nav className="flex overflow-x-auto border-b border-white/10 bg-[#111315] px-3" role="tablist" aria-label={isZh ? '运行产物' : 'Run artifacts'}>
+            <TabButton active={activeTab === 'prd'} icon={<FileText className="h-4 w-4" />} label={isZh ? 'PRD 草案' : 'PRD Draft'} onClick={() => setActiveTab('prd')} />
+            <TabButton active={activeTab === 'prototype'} icon={<Code2 className="h-4 w-4" />} label={isZh ? '原型' : 'Prototype'} onClick={() => setActiveTab('prototype')} />
+            <TabButton active={activeTab === 'check'} icon={<ShieldCheck className="h-4 w-4" />} label={isZh ? '质量门禁' : 'Quality Check'} onClick={() => setActiveTab('check')} />
+            <TabButton active={activeTab === 'trace'} icon={<Activity className="h-4 w-4" />} label={isZh ? 'Trace 日志' : 'Trace Log'} onClick={() => setActiveTab('trace')} />
+          </nav>
+
+          <div className="p-4 md:p-6">
+            <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+              <div className="flex items-center gap-2 text-xs text-white/50"><span className="h-2 w-2 rounded-full bg-emerald-400" />{isZh ? '本次运行的资产已绑定到上下文与版本' : 'Artifacts are pinned to this run and its context'}</div>
+              <div className="flex flex-wrap gap-2">
+                {artifactSnapshots.slice(0, 3).map((artifact) => <span key={artifact.id} className="rounded border border-white/10 bg-white/[0.035] px-2 py-1 text-[10px] text-white/55">{artifact.name} <span className="text-white/90">{artifact.version}</span></span>)}
               </div>
-              <div className="h-px flex-1 bg-gradient-to-r from-white/20 via-white/20 to-transparent"></div>
             </div>
 
-            <ChatMessage 
-              role="agent" 
-              time="10:06 AM"
-              content={t(
-                "Understood. I have updated the PRD to mandate Data Source and Refresh Frequency. I have also regenerated the Prototype Preview to reflect this structure.",
-                "明白。我已更新 PRD 强制要求数据源和刷新频率。同时我已重新生成原型预览以反映此结构。"
-              )}
-            />
-            
-            <ChatMessage 
-              role="user" 
-              time="10:12 AM"
-              content={t(
-                "Remove the Team Leaderboard widget, it wasn't requested.",
-                "移除团队排行榜组件，我们没有这个需求。"
-              )}
-            />
-
-            <div className="flex items-center gap-2 my-2 opacity-80">
-              <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
-              <div className="text-[10px] uppercase font-bold tracking-widest text-[#c2c2c2] flex items-center gap-1">
-                <CheckCircle className="w-3 h-3" /> {t('Gate Triggered', '门禁已触发')}
-              </div>
-              <div className="h-px flex-1 bg-gradient-to-r from-white/20 via-white/20 to-transparent"></div>
-            </div>
-
-            <ChatMessage 
-              role="agent" 
-              time="10:15 AM"
-              content={t(
-                "Removed the Team Leaderboard. I ran the consistency check, and it flagged a missing empty state for the Todo List module. Please review the Quality Check tab.",
-                "已移除团队排行榜。我运行了一致性校验，发现待办列表模块缺少空状态定义。请查看质量检查标签页。"
-              )}
-            />
+            {activeTab === 'prd' && <PrdPanel isZh={isZh} sources={sources} skills={skills.slice(0, 2)} />}
+            {activeTab === 'prototype' && <PrototypePanel isZh={isZh} />}
+            {activeTab === 'check' && <CheckPanel isZh={isZh} />}
+            {activeTab === 'trace' && <TracePanel isZh={isZh} proposalApproved={proposal.status === 'approved'} traceEvents={traceEvents} onApprove={() => setProposal((current) => approveImprovementProposal(current))} />}
           </div>
-          <div className="p-4 border-t border-white/10 bg-[#0a0a0a]/70">
-            <div className="relative">
-              <textarea 
-                className="w-full bg-[#07111f] border border-white/15 rounded-xl px-4 py-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-white/20 text-[#ededed] placeholder:text-[#c2c2c2]/70" 
-                placeholder={t("Clarify requirements or adjust prototype...", "澄清需求或调整原型...")}
-                rows={3}
-              ></textarea>
-              <Button size="sm" className="absolute bottom-2 right-2 rounded-lg">{t('Send', '发送')}</Button>
-            </div>
-          </div>
-        </div>
-
-        {/* Right Pane: Artifacts */}
-        <div className="flex-1 flex flex-col bg-[#0a0a0a]">
-          <div className="h-14 border-b border-white/10 bg-[#0a0a0a]/80 backdrop-blur-sm flex px-4 gap-2 items-end pt-2 shrink-0">
-            <TabButton active={activeTab === 'prd'} onClick={() => setActiveTab('prd')} icon={<FileText className="w-4 h-4" />} label={t("PRD Draft", "PRD 草案")} />
-            <TabButton active={activeTab === 'prototype'} onClick={() => setActiveTab('prototype')} icon={<Code className="w-4 h-4" />} label={t("Prototype", "原型图")} />
-            <TabButton active={activeTab === 'check'} onClick={() => setActiveTab('check')} icon={<CheckCircle className="w-4 h-4" />} label={t("Quality Check", "质量检查")} />
-            <TabButton active={activeTab === 'trace'} onClick={() => setActiveTab('trace')} icon={<Activity className="w-4 h-4" />} label={t("Trace Log", "追踪日志")} />
-          </div>
-          
-          <div className="flex-1 overflow-auto p-6">
-            <div className="max-w-4xl mx-auto h-full">
-              {activeTab === 'prd' && <PRDStep />}
-              {activeTab === 'prototype' && <PrototypeStep />}
-              {activeTab === 'check' && <CheckStep />}
-              {activeTab === 'trace' && <TraceStep onNext={() => onNavigate('baseDetail')} traceEvents={traceEvents} />}
-            </div>
-          </div>
-        </div>
-      </div>
+        </section>
+      </main>
     </div>
   );
 }
 
-function ChatMessage({ role, content, time }: { role: 'user' | 'agent', content: string, time: string }) {
-  const isAgent = role === 'agent';
-  return (
-    <div className={`flex gap-3 ${isAgent ? '' : 'flex-row-reverse'}`}>
-      <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${isAgent ? 'bg-[#0d1b31] text-[#ededed] border border-white/15' : 'bg-zinc-800 text-white'}`}>
-        {isAgent ? <Sparkles className="w-4 h-4" /> : <div className="text-xs font-semibold">PM</div>}
-      </div>
-      <div className={`flex flex-col ${isAgent ? 'items-start' : 'items-end'}`}>
-        <div className={`p-3 rounded-2xl max-w-[320px] text-sm leading-relaxed ${isAgent ? 'bg-white border border-white/10 text-[#08142F] rounded-tl-sm shadow-sm' : 'bg-zinc-800 text-white rounded-tr-sm shadow-sm'}`}>
-          {content}
-        </div>
-        <div className="text-[10px] text-[#8A96AD] mt-1 font-medium">{time}</div>
-      </div>
+function getInitialConversation(isZh: boolean): RunMessage[] {
+  return isZh
+    ? [
+      { id: 'pm-1', role: 'pm', timestamp: '10:00 AM', content: '希望在北美会员 Hub 内新增 Referral 功能，让会员可以分享专属链接，并在好友订单发货后获得奖励。' },
+      { id: 'agent-1', role: 'agent', timestamp: '10:02 AM', content: '已命中 DTC 业务宪章与美国会员体系 PRD。我会按“功能组件”路由生成草案，并保留 Antavo 与 Shopify 的能力边界待确认。' },
+      { id: 'pm-2', role: 'pm', timestamp: '10:05 AM', content: '确认：取消或退款订单不计入推荐成功；奖励记录必须能让会员自行查看。' },
+      { id: 'agent-2', role: 'agent', timestamp: '10:06 AM', content: '已将退款排除规则写入 PRD，并同步标记为原型展示与质量门禁的必检项。右侧已更新当前草案。' },
+    ]
+    : [
+      { id: 'pm-1', role: 'pm', timestamp: '10:00 AM', content: 'Add a Referral capability to the North America membership Hub. Members should share a unique link and earn rewards after a referred order is fulfilled.' },
+      { id: 'agent-1', role: 'agent', timestamp: '10:02 AM', content: 'I matched the DTC business constitution and US Membership PRD. I will use the functional-component route and keep Antavo and Shopify capability boundaries open for confirmation.' },
+      { id: 'pm-2', role: 'pm', timestamp: '10:05 AM', content: 'Confirmed: cancelled or refunded orders must not count as referral success, and members need a visible reward history.' },
+      { id: 'agent-2', role: 'agent', timestamp: '10:06 AM', content: 'Captured. The refund exclusion is now in the PRD and marked as required in both the prototype and quality gate.' },
+    ];
+}
+
+function ChatMessage({ message, isZh }: { message: RunMessage; isZh: boolean }) {
+  const isPm = message.role === 'pm';
+  return <div className={`flex gap-3 ${isPm ? 'flex-row-reverse' : ''}`}>
+    <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[10px] font-semibold ${isPm ? 'bg-white/10 text-white' : 'bg-emerald-400/15 text-emerald-300'}`}>
+      {isPm ? <UserRound className="h-3.5 w-3.5" /> : <Sparkles className="h-3.5 w-3.5" />}
     </div>
-  );
-}
-
-function TabButton({ active, onClick, icon, label }: { active: boolean, onClick: () => void, icon: React.ReactNode, label: string }) {
-  return (
-    <button 
-      onClick={onClick}
-      className={`flex items-center gap-2 px-4 py-2.5 rounded-t-lg text-sm font-medium transition-colors border border-b-0 ${
-        active ? 'bg-[#0d1b31] border-white/15 text-[#ededed]' : 'bg-transparent border-transparent text-[#c2c2c2] hover:text-[#ededed] hover:bg-white/10'
-      }`}
-      style={{ marginBottom: active ? '-1px' : '0' }}
-    >
-      {icon}
-      {label}
-    </button>
-  );
-}
-
-function PRDStep() {
-  const { lang, t } = useTranslation();
-  return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 h-full">
-      <Card className="col-span-2 p-8 overflow-auto shadow-sm flex flex-col">
-        <div className="flex items-center gap-3 mb-6 border-b border-[#F0F4F8] pb-4 shrink-0">
-          <FileText className="w-5 h-5 text-[#ededed]" />
-          <h2 className="text-lg font-semibold text-[#08142F]">{t('PRD Draft', 'PRD 草案')}</h2>
-        </div>
-        
-        <div className="flex-1 overflow-auto pr-4 space-y-6 text-[#08142F]">
-          <div>
-            <h3 className="font-semibold text-base mb-2">{t('1. Background & Goals', '1. 背景与目标')}</h3>
-            <p className="text-[#5F6F8C] leading-relaxed">{t('Reduce context switching by providing a unified workspace for different roles.', '通过为不同角色提供统一的工作台，减少上下文切换。')}</p>
-          </div>
-          
-          <div>
-            <h3 className="font-semibold text-base mb-3">{t('2. Core Modules', '2. 核心模块')}</h3>
-            
-            <div className="space-y-4">
-              <div className="bg-white border border-white/10 p-4 rounded-lg shadow-sm">
-                <h4 className="font-medium text-[#ededed] mb-1">{t('2.1 Metric Cards', '2.1 指标卡片')}</h4>
-                <p className="text-sm text-[#5F6F8C]">{t('Display key metrics relevant to the user\'s role.', '展示与用户角色相关的核心指标。')}</p>
-                
-                {/* Simulated human edit */}
-                <div className="mt-4 bg-amber-50/50 border border-amber-200 p-3 rounded-md text-sm flex gap-3">
-                  <div className="w-6 h-6 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
-                    <span className="text-xs font-bold text-amber-700">PM</span>
-                  </div>
-                  <div>
-                    <span className="font-semibold text-amber-800 text-xs uppercase tracking-wider block mb-1">{t('Human Edit', '人工修改')}</span>
-                    <ins className="no-underline text-[#08142F] block">{t('Added requirement: All metric cards must explicitly display their data source and refresh frequency (e.g., \'Real-time\', \'Hourly\').', '新增需求：所有指标卡片必须明确显示数据源和刷新频率（例如：“实时”、“每小时”）。')}</ins>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="bg-white border border-white/10 p-4 rounded-lg shadow-sm">
-                <h4 className="font-medium text-[#ededed] mb-1">{t('2.2 Risk Alerts', '2.2 风险预警')}</h4>
-                <p className="text-sm text-[#5F6F8C]">{t('Highlight pending items that require immediate attention.', '高亮显示需要立即关注的待处理事项。')}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <div className="flex justify-between mt-6 border-t border-white/10 pt-6 shrink-0 items-center">
-          <span className="text-xs text-[#8A96AD]">{t('Auto-saved 10:15 AM', '自动保存于 10:15 AM')}</span>
-          <Button variant="outline" size="sm">{t('Edit Document', '编辑文档')}</Button>
-        </div>
-      </Card>
-      
-      <div className="space-y-4 flex flex-col">
-        <Card className="p-6 bg-[#161616] text-white border border-white/10 shadow-none">
-          <h3 className="text-xs font-semibold text-white/50 uppercase tracking-widest mb-4 pb-3 border-b border-white/10 flex items-center gap-2">
-            <CheckCircle className="w-4 h-4" /> {t('Active Skills', '已启用技能')}
-          </h3>
-          <div className="space-y-3 text-sm">
-            <div className="flex items-center gap-3 bg-white/5 p-2 rounded-lg border border-white/10"><CheckCircle className="w-4 h-4 text-emerald-400"/> {t('PRD Draft Skill v1.2', 'PRD 草案技能 v1.2')}</div>
-            <div className="flex items-center gap-3 bg-white/5 p-2 rounded-lg border border-white/10 text-white/70"><CheckSquare className="w-4 h-4 text-[#ededed]"/> {t('Applied Workspace Template', '应用了工作台模板')}</div>
-          </div>
-        </Card>
-      </div>
+    <div className={`min-w-0 max-w-[82%] ${isPm ? 'items-end' : 'items-start'} flex flex-col`}>
+      <div className={`rounded-xl border px-3.5 py-3 text-sm leading-relaxed ${isPm ? 'border-white/15 bg-[#3d3d3d] text-white' : 'border-white/10 bg-[#292b2e] text-white/90'}`}>{message.content}</div>
+      <span className="mt-1.5 px-1 text-[10px] text-white/35">{message.timestamp} {isPm ? (isZh ? 'PM' : 'PM') : 'Base Agent'}</span>
     </div>
-  );
+  </div>;
 }
 
-function PrototypeStep() {
-  const { lang, t } = useTranslation();
-  return (
-    <Card className="flex flex-col h-full min-h-[500px] overflow-hidden bg-[#F4F8FF] shadow-sm">
-      <div className="h-12 border-b border-white/10 bg-[#0a0a0a]/75 backdrop-blur-sm flex items-center px-4 justify-between shrink-0">
-        <div className="flex space-x-2">
-          <div className="w-3 h-3 rounded-full bg-red-400"></div>
-          <div className="w-3 h-3 rounded-full bg-amber-400"></div>
-          <div className="w-3 h-3 rounded-full bg-emerald-400"></div>
-        </div>
-        <div className="text-xs font-semibold uppercase tracking-wider text-[#5F6F8C] flex items-center gap-2">
-          <Code className="w-4 h-4" />
-          {t('Role-based Workspace - Preview', '角色化工作台 - 预览')}
-        </div>
-        <div className="w-16"></div>
-      </div>
-      <div className="flex-1 p-8 overflow-auto">
-        <div className="max-w-4xl mx-auto space-y-6">
-          <div className="grid grid-cols-3 gap-6">
-            <Card className="p-5 flex flex-col justify-between bg-white shadow-sm border-white/60">
-              <div className="text-xs font-semibold uppercase tracking-wider text-[#5F6F8C]">{t('Total Tasks', '总任务数')}</div>
-              <div className="text-3xl font-semibold text-[#08142F] mt-2">124</div>
-            </Card>
-            <Card className="p-5 relative flex flex-col justify-between bg-white shadow-sm border-amber-300 ring-2 ring-amber-400/20">
-              <div className="absolute -top-3 -right-3 bg-amber-500 text-white text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md shadow-md flex items-center gap-1">
-                <Search className="w-3 h-3" /> {t('Missing Source', '缺少来源')}
-              </div>
-              <div className="text-xs font-semibold uppercase tracking-wider text-[#5F6F8C]">{t('Conversion Rate', '转化率')}</div>
-              <div className="text-3xl font-semibold text-[#08142F] mt-2">4.2<span className="text-lg text-[#5F6F8C] ml-1">%</span></div>
-            </Card>
-            <Card className="p-5 flex flex-col justify-between bg-white shadow-sm border-white/60">
-              <div className="text-xs font-semibold uppercase tracking-wider text-[#5F6F8C]">{t('Active Risks', '活跃风险')}</div>
-              <div className="text-3xl font-semibold text-rose-500 mt-2">3</div>
-            </Card>
-          </div>
-          <Card className="h-64 bg-white/50 border-dashed border-2 border-white/15 flex flex-col items-center justify-center text-[#8A96AD]">
-            <LayoutGrid className="w-8 h-8 mb-3 opacity-50" />
-            <div className="font-medium">{t('Todo List Module Placeholder', '待办列表模块占位符')}</div>
-          </Card>
-        </div>
-      </div>
-      <div className="bg-[#0a0a0a]/75 backdrop-blur-sm p-4 border-t border-white/10 flex justify-between shrink-0 items-center">
-        <span className="text-xs text-[#8A96AD]">{t('Mapped to PRD Draft v2', '已映射至 PRD 草案 v2')}</span>
-        <Button variant="outline" size="sm">{t('Open Sandbox', '打开沙盒')}</Button>
+function TraceDivider({ isZh }: { isZh: boolean }) {
+  return <div className="flex items-center gap-3 py-1"><span className="h-px flex-1 bg-white/10" /><span className="flex items-center gap-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-emerald-300"><Activity className="h-3 w-3" />{isZh ? 'Trace 已记录' : 'Trace captured'}</span><span className="h-px flex-1 bg-white/10" /></div>;
+}
+
+function TabButton({ active, icon, label, onClick }: { active: boolean; icon: React.ReactNode; label: string; onClick: () => void }) {
+  return <button type="button" role="tab" aria-selected={active} onClick={onClick} className={`flex shrink-0 items-center gap-2 border-b-2 px-4 py-4 text-sm font-medium transition-colors ${active ? 'border-emerald-400 bg-white/[0.055] text-white' : 'border-transparent text-white/55 hover:text-white'}`}>{icon}{label}</button>;
+}
+
+function PrdPanel({ isZh, sources, skills }: { isZh: boolean; sources: Array<{ id: string; name: string; description: string }>; skills: Array<{ id: string; name: string; version: string; purpose: string }> }) {
+  return <div className="grid gap-5 2xl:grid-cols-[minmax(0,1fr)_220px]">
+    <Card className="rounded-xl border-white/10 bg-[#1b1d20] p-5 md:p-7">
+      <div className="mb-6 flex flex-wrap items-start justify-between gap-3 border-b border-white/10 pb-5"><div className="flex items-center gap-2"><FileText className="h-5 w-5 text-emerald-300" /><div><h2 className="font-semibold text-white">{isZh ? 'PRD 草案' : 'PRD Draft'}</h2><p className="mt-1 text-xs text-white/45">referral-prd.md · v0.1</p></div></div><Badge className="border-amber-300/20 bg-amber-300/10 text-amber-100">{isZh ? '待评审' : 'Needs review'}</Badge></div>
+      <div className="space-y-7 text-sm leading-relaxed text-white/70">
+        <DocSection title={isZh ? '1. 背景与目标' : '1. Background & Goals'}>{isZh ? '在北美会员 Hub 中提供统一的 Referral 入口、专属链接与奖励记录，降低会员分享路径的操作成本。' : 'Provide a unified referral entry, unique link, and reward history in the North America membership Hub.'}</DocSection>
+        <DocSection title={isZh ? '2. 核心模块' : '2. Core Modules'}>
+          <RequirementCard title={isZh ? '2.1 Referral 入口与专属链接' : '2.1 Referral Entry & Unique Link'} copy={isZh ? '仅对登录会员展示；支持复制链接并进入购买路径。' : 'Visible to signed-in members; supports copying a link into the purchase path.'} />
+          <RequirementCard title={isZh ? '2.2 奖励记录与成功判定' : '2.2 Reward History & Success'} copy={isZh ? '订单发货后更新奖励；取消或退款订单不计入推荐成功。' : 'Rewards update after fulfillment; cancelled or refunded orders do not count as success.'} highlighted />
+        </DocSection>
+        <DocSection title={isZh ? '3. 待确认边界' : '3. Open Boundaries'}>{isZh ? 'Antavo 与 Shopify 的具体职责、字段来源和同步频率需要在开发前确认。' : 'Antavo and Shopify ownership, field sources, and refresh cadence need confirmation before development.'}</DocSection>
       </div>
     </Card>
-  );
+    <aside className="space-y-4">
+      <Card className="rounded-xl border-white/10 bg-[#1b1d20] p-4"><div className="mb-4 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.1em] text-white/60"><CheckCircle2 className="h-4 w-4 text-emerald-400" />{isZh ? '已启用技能' : 'Active Skills'}</div><div className="space-y-2">{skills.map((skill) => <div key={skill.id} className="rounded-lg border border-white/10 bg-white/[0.035] p-3"><div className="flex items-start gap-2"><Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-400" /><div><div className="text-xs font-medium text-white">{skill.name} v{skill.version}</div><div className="mt-1 text-[11px] leading-relaxed text-white/45">{skill.purpose}</div></div></div></div>)}</div></Card>
+      <Card className="rounded-xl border-white/10 bg-[#17191c] p-4"><div className="mb-3 text-xs font-semibold uppercase tracking-[0.1em] text-white/60">{isZh ? '命中上下文' : 'Matched Context'}</div><div className="space-y-2">{sources.map((source) => <div key={source.id} className="rounded-md border border-white/10 bg-white/[0.025] p-2.5"><div className="text-xs font-medium text-white">{source.name}</div><div className="mt-1 text-[11px] leading-relaxed text-white/45">{source.description}</div></div>)}</div></Card>
+    </aside>
+  </div>;
 }
 
-function CheckStep() {
-  const { lang, t } = useTranslation();
-  return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between border-b border-white/10 pb-4">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center border border-white/15">
-            <CheckCircle className="w-5 h-5 text-[#ededed]" />
-          </div>
-          <div>
-            <h2 className="text-2xl font-semibold text-[#08142F]">{t('Consistency Check Report', '一致性校验报告')}</h2>
-            <p className="text-sm text-[#5F6F8C]">{t('Evaluated against Quality Gates', '根据质量门禁评估')}</p>
-          </div>
-        </div>
-        <Badge variant="warning">{lang === 'zh' ? '发现 3 个问题' : '3 Issues Found'}</Badge>
-      </div>
+function DocSection({ title, children }: { title: string; children: React.ReactNode }) { return <section><h3 className="mb-2 text-sm font-semibold text-white">{title}</h3><div>{children}</div></section>; }
+function RequirementCard({ title, copy, highlighted = false }: { title: string; copy: string; highlighted?: boolean }) { return <div className={`mt-3 rounded-lg border p-4 ${highlighted ? 'border-amber-300/35 bg-amber-300/[0.09]' : 'border-white/10 bg-white/[0.045]'}`}><div className="font-medium text-white">{title}</div><p className="mt-1.5 text-sm leading-relaxed text-white/60">{copy}</p>{highlighted && <div className="mt-3 flex items-start gap-2 border-t border-amber-300/20 pt-3 text-xs text-amber-100"><UserRound className="mt-0.5 h-3.5 w-3.5 shrink-0" />{`Human edit: ${copy}`}</div>}</div>; }
 
-      <Card className="overflow-hidden shadow-sm">
-        <table className="w-full text-left text-sm">
-          <thead className="bg-[#F8FAFC] text-[#5F6F8C] border-b border-white/10">
-            <tr>
-              <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider">{t('Issue', '问题')}</th>
-              <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider">{t('Severity', '严重程度')}</th>
-              <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider">{t('Recommendation', '建议')}</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-[#F0F4F8] bg-white">
-            <tr className="hover:bg-[#F8FAFC]/50 transition-colors">
-              <td className="px-6 py-5 font-medium text-[#08142F]">{t('Prototype missing empty/loading states for Todo List.', '原型图缺少待办列表的空状态/加载状态。')}</td>
-              <td className="px-6 py-5"><Badge variant="warning">{t('High', '高')}</Badge></td>
-              <td className="px-6 py-5 text-[#5F6F8C]">{t('Add comprehensive state coverage to the list module.', '为列表模块添加完整的状态覆盖。')}</td>
-            </tr>
-            <tr className="hover:bg-[#F8FAFC]/50 transition-colors">
-              <td className="px-6 py-5 font-medium text-[#08142F]">{t('PRD specifies Data Source for metrics, but Prototype lacks this field.', 'PRD 规定了指标的数据源，但原型图中缺少该字段。')}</td>
-              <td className="px-6 py-5"><Badge variant="warning">{t('Medium', '中')}</Badge></td>
-              <td className="px-6 py-5 text-[#5F6F8C]">{t('Update metric cards in prototype to include source tags.', '更新原型中的指标卡片，加入数据源标签。')}</td>
-            </tr>
-            <tr className="hover:bg-[#F8FAFC]/50 transition-colors">
-              <td className="px-6 py-5 font-medium text-[#08142F]">{t('AI generated a \'Team Leaderboard\' not defined in PRD.', 'AI 生成了 PRD 中未定义的“团队排行榜”。')}</td>
-              <td className="px-6 py-5"><Badge variant="outline" className="bg-[#F4F8FF]">{t('Info', '提示')}</Badge></td>
-              <td className="px-6 py-5 text-[#5F6F8C]">{t('Confirm with PM or remove unsupported assumption.', '与 PM 确认或移除该推测。')}</td>
-            </tr>
-          </tbody>
-        </table>
-      </Card>
-    </div>
-  );
+function PrototypePanel({ isZh }: { isZh: boolean }) {
+  const cards = isZh ? [['Referral 入口', '登录会员可见'], ['专属链接', '复制后进入购买链路'], ['奖励记录', '发货后更新']]
+    : [['Referral entry', 'Visible to signed-in members'], ['Unique link', 'Moves into the purchase path'], ['Reward history', 'Updates after fulfillment']];
+  return <Card className="overflow-hidden rounded-xl border-white/10 bg-[#1b1d20]"><div className="flex items-center justify-between border-b border-white/10 bg-[#272a2e] px-5 py-3"><div className="flex gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-rose-400" /><span className="h-2.5 w-2.5 rounded-full bg-amber-300" /><span className="h-2.5 w-2.5 rounded-full bg-emerald-400" /></div><span className="text-xs text-white/45">membership-hub / referral-hub.html</span></div><div className="p-5 md:p-8"><div className="mb-7 flex flex-wrap items-center justify-between gap-4"><div><div className="text-xs font-semibold uppercase tracking-[0.12em] text-emerald-300">Membership Hub</div><h2 className="mt-2 text-xl font-semibold text-white">{isZh ? '分享给朋友，解锁下一份奖励' : 'Share with a friend, unlock your next reward'}</h2></div><Button size="sm" className="bg-emerald-400 text-[#10211d] hover:bg-emerald-300">{isZh ? '复制推荐链接' : 'Copy referral link'}</Button></div><div className="grid gap-3 md:grid-cols-3">{cards.map(([title, copy]) => <div className="rounded-lg border border-white/10 bg-[#111315] p-4" key={title}><CheckCircle2 className="mb-5 h-5 w-5 text-emerald-400" /><div className="text-sm font-medium text-white">{title}</div><p className="mt-1.5 text-xs leading-relaxed text-white/50">{copy}</p></div>)}</div><div className="mt-4 rounded-lg border border-amber-300/25 bg-amber-300/[0.08] px-4 py-3 text-sm text-amber-100">{isZh ? '质量规则：取消或退款订单不会计入推荐成功。' : 'Quality rule: cancelled or refunded orders do not count as referral success.'}</div></div></Card>;
 }
 
-function TraceStep({ onNext, traceEvents }: { onNext: () => void, traceEvents: any[] }) {
-  const { lang, t } = useTranslation();
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-      <div>
-        <h2 className="text-sm font-semibold uppercase tracking-wider mb-6 border-b border-white/10 pb-3 text-[#ededed]">{t('Event Trace', '事件追踪')}</h2>
-        <div className="space-y-6 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-[2px] before:bg-gradient-to-b before:from-white/35 before:via-white/15 before:to-transparent">
-          {traceEvents.map((tr, i) => (
-            <div key={tr.id} className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
-              <div className="flex items-center justify-center w-10 h-10 rounded-full border-2 border-white/15 bg-[#0d1b31] text-white text-[10px] font-bold shadow-md shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
-                {tr.timestamp.split(' ')[0]}
-              </div>
-              <Card className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-5 shadow-sm hover:shadow-md transition-shadow bg-[rgba(212,212,212,0.1)] border-white/15">
-                <div className="flex justify-between items-start mb-3 border-b border-white/10 pb-2">
-                  <div className="text-sm font-semibold text-[#08142F]">{tr.eventType}</div>
-                  <Badge variant="outline" className="text-[9px] py-0 h-4">{tr.step}</Badge>
-                </div>
-                <p className="text-sm text-[#5F6F8C] mb-3 leading-relaxed">{tr.description}</p>
-                {tr.feedbackTag && (
-                  <div className="flex gap-2">
-                    <span className="inline-flex items-center px-2 py-1 rounded bg-white/10 border border-white/15 text-[10px] font-semibold uppercase tracking-wider text-[#ededed]">
-                      Tag: {tr.feedbackTag}
-                    </span>
-                  </div>
-                )}
-              </Card>
-            </div>
-          ))}
-        </div>
-      </div>
-      
-      <div>
-        <h2 className="text-sm font-semibold uppercase tracking-wider mb-6 border-b border-white/10 pb-3 text-[#ededed]">{t('Optimization Candidates', '优化项分析')}</h2>
-        <Card className="p-8 bg-[#161616] text-white border border-white/10 shadow-none relative overflow-hidden">
-          <div className="absolute top-0 right-0 p-4 opacity-10">
-            <Play className="w-24 h-24" />
-          </div>
-          <div className="mb-8 relative z-10">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/10 border border-white/15 rounded-full text-[10px] font-bold uppercase tracking-widest text-[#ededed] mb-4">
-              <Sparkles className="w-3 h-3" /> {t('Improvement Agent Insight', '智能体优化洞察')}
-            </div>
-            <p className="text-lg text-white/90 leading-relaxed font-medium">
-              {t('62% of Workspace PRDs required manual addition of "Data Source & Refresh Frequency".', '62% 的工作台 PRD 均需要人工手动补充“数据源及刷新频率”。')} 
-            </p>
-          </div>
-          
-          <div className="border border-white/20 rounded-xl p-5 bg-white/5 mb-8 relative z-10 backdrop-blur-sm">
-            <div className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
-              {t('Proposed Update: PRD Draft Skill v1.3', '提议更新：PRD 草案生成技能 v1.3')}
-            </div>
-            <ul className="text-sm text-[#ededed] space-y-2 font-mono">
-              <li className="flex items-start gap-2"><ArrowRight className="w-4 h-4 mt-0.5 shrink-0"/> {t('Add required "Data Source" section in template', '在模板中增加必填的“数据源”部分')}</li>
-              <li className="flex items-start gap-2"><ArrowRight className="w-4 h-4 mt-0.5 shrink-0"/> {t('Require role visibility rules for widgets', '要求注明每个组件的角色可见性')}</li>
-              <li className="flex items-start gap-2"><ArrowRight className="w-4 h-4 mt-0.5 shrink-0"/> {t('Mark unsupported solution assumptions as "Needs confirmation"', '将无依据的推测标记为“需要确认”')}</li>
-            </ul>
-          </div>
-          
-          <div className="flex justify-end gap-3 mt-6 relative z-10 border-t border-white/10 pt-6">
-            <Button variant="ghost" className="text-white/60 hover:bg-white/10 hover:text-white">{t('Reject', '拒绝')}</Button>
-            <Button className="bg-[#0d1b31] border border-white/15 text-white hover:bg-[#14345f] shadow-none" onClick={onNext}>{t('Approve to Base', '同意并合并至基座')}</Button>
-          </div>
-        </Card>
-      </div>
-    </div>
-  );
+function CheckPanel({ isZh }: { isZh: boolean }) {
+  const checks = isZh ? [['事实与范围', 'Antavo 与 Shopify 的职责边界仍需确认', '阻塞'], ['原型规则呈现', '退款订单排除规则已在原型中呈现', '通过'], ['状态覆盖', '奖励记录的空状态仍待补充', '待处理']]
+    : [['Facts & scope', 'Antavo and Shopify ownership still needs confirmation', 'Blocked'], ['Prototype rules', 'The refund-exclusion rule is visible in the prototype', 'Passed'], ['State coverage', 'Reward history empty state still needs coverage', 'Pending']];
+  return <Card className="rounded-xl border-white/10 bg-[#1b1d20] p-5 md:p-7"><div className="mb-6 flex items-center gap-3"><span className="rounded-lg bg-amber-300/10 p-2 text-amber-200"><ClipboardCheck className="h-5 w-5" /></span><div><h2 className="font-semibold text-white">{isZh ? '质量门禁报告' : 'Quality Gate Report'}</h2><p className="mt-1 text-sm text-white/50">{isZh ? '一个阻塞项需要确认后才能发布。' : 'One blocking item needs confirmation before release.'}</p></div></div><div className="space-y-3">{checks.map(([title, detail, status]) => <div className="grid gap-3 rounded-lg border border-white/10 bg-white/[0.035] p-4 md:grid-cols-[160px_minmax(0,1fr)_auto] md:items-center" key={title}><div className="text-sm font-medium text-white">{title}</div><div className="text-sm leading-relaxed text-white/60">{detail}</div><StatusBadge status={status} /></div>)}</div></Card>;
+}
+
+function StatusBadge({ status }: { status: string }) { const passed = status === 'Passed' || status === '通过'; const blocked = status === 'Blocked' || status === '阻塞'; return <Badge className={passed ? 'border-emerald-400/25 bg-emerald-400/10 text-emerald-300' : blocked ? 'border-amber-300/25 bg-amber-300/10 text-amber-100' : 'border-white/10 bg-white/5 text-white/60'}>{status}</Badge>; }
+
+function TracePanel({ isZh, traceEvents, proposalApproved, onApprove }: { isZh: boolean; traceEvents: Array<{ id: string; timestamp: string; eventType: string; description: string; feedbackTag?: string }>; proposalApproved: boolean; onApprove: () => void }) {
+  return <div className="grid gap-5 2xl:grid-cols-[minmax(0,1fr)_300px]"><Card className="rounded-xl border-white/10 bg-[#1b1d20] p-5 md:p-6"><div className="mb-5 flex items-center gap-2 text-sm font-semibold text-white"><Activity className="h-4 w-4 text-emerald-400" />{isZh ? '运行事件' : 'Run events'}</div><div className="space-y-3">{traceEvents.map((event) => <div className="flex gap-3" key={event.id}><span className="mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-emerald-400/25 bg-emerald-400/10"><Activity className="h-3 w-3 text-emerald-300" /></span><div className="min-w-0 flex-1 rounded-lg border border-white/10 bg-white/[0.035] p-3"><div className="flex flex-wrap items-center justify-between gap-2"><span className="text-xs font-medium text-white">{event.eventType}</span><span className="text-[11px] text-white/40">{event.timestamp}</span></div><p className="mt-1.5 text-sm leading-relaxed text-white/60">{event.description}</p>{event.feedbackTag && <span className="mt-2 inline-flex rounded bg-emerald-400/10 px-2 py-1 text-[10px] text-emerald-300">{event.feedbackTag}</span>}</div></div>)}</div></Card><Card className="rounded-xl border-emerald-400/20 bg-[#12211e] p-5"><div className="mb-4 flex items-center gap-2 text-sm font-semibold text-white"><GitPullRequest className="h-4 w-4 text-emerald-400" />{isZh ? '合并到 Base' : 'Merge to Base'}</div><p className="rounded-lg border border-white/10 bg-black/10 p-3 text-sm leading-relaxed text-white/70">{isZh ? '将退款订单排除规则与外部能力确认项加入功能组件需求的默认质量检查。' : 'Add refund-order exclusions and external capability confirmation to the default checks for functional-component requests.'}</p><div className="my-4 flex items-center gap-2 text-xs text-white/50"><CheckCircle2 className="h-4 w-4 text-emerald-400" />{isZh ? '来自 4 次相似人工修订' : 'Attributed from 4 similar human edits'}</div>{proposalApproved ? <div className="flex items-center gap-2 rounded-lg border border-emerald-400/25 bg-emerald-400/10 p-3 text-sm font-medium text-emerald-100"><CheckCircle2 className="h-4 w-4" />{isZh ? '已批准并合并至 v1.4' : 'Approved and merged to v1.4'}</div> : <Button className="w-full bg-emerald-400 text-[#10211d] hover:bg-emerald-300" onClick={onApprove}><CheckCircle2 className="mr-2 h-4 w-4" />{isZh ? '批准合并到 Base' : 'Approve and merge to Base'}</Button>}</Card></div>;
 }
