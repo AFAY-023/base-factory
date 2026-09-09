@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+
+<html data-page="intro" lang="zh-CN"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><meta content="从“个人快了，组织没快”的实际判断出发，介绍 BASE 的组织提效、岗位稳定、企业管理与个人提效价值，以及模板、自定义和项目空间设计。" name="description"/><title>BASE · 企业岗位 Agent 工作台｜产品设计案例</title><link href="https://fonts.googleapis.com/css2?family=Doto:wght@600;800&amp;family=Space+Grotesk:wght@400;500;600;700&amp;family=Space+Mono:wght@400;700&amp;family=Noto+Sans+SC:wght@400;500;700&amp;display=swap" rel="stylesheet"/><style>
+:root{
+  --ground:#F7F9FC;
+  --surface:#FFFFFF;
+  --sunk:#EEF2F8;
+  --ink:#111318;
+  --ink-soft:#39414F;
+  --muted:#667085;
+  --line:#E1E6EF;
+  --line-strong:#C6CFDC;
+  --blue:#2458F5;
+  --blue-soft:#EDF3FF;
+  --blue-ink:#1B3FAE;
+  --seam:#C8481A;
+  --seam-soft:#FCEDE6;
+  --silver:#8E9BAF;
+
+  --display:"Doto","Space Mono",monospace;
+  --sans:"Space Grotesk","Noto Sans SC","Microsoft YaHei","PingFang SC",system-ui,sans-serif;
+  --mono:"Space Mono","Noto Sans SC","Microsoft YaHei",ui-monospace,monospace;
+
+  --measure:34em;
+}
+/* 本页固定浅色：沿用 BASE 原型的蓝图配色，不随系统深色切换 */
+:root{color-scheme:light}
+
+*{box-sizing:border-box}
+body{
+  background:var(--ground);
+  color:var(--ink);
+  font-family:var(--sans);
+  font-size:16px;
+  line-height:1.86;
+  -webkit-font-smoothing:antialiased;
+}
+.page{max-width:1000px;margin:0 auto;padding:0 26px 110px}
+.col{max-width:var(--measure)}
+p{margin:0 0 18px;max-width:var(--measure)}
+p:last-child{margin-bottom:0}
+strong{font-weight:600;color:var(--ink)}
+
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+  padding:18px 0 16px;
+  border-bottom:1px solid var(--line);
+  font-family:var(--mono);font-size:.66rem;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--muted);
+}
+.topbar b{font-weight:400;color:var(--ink)}
+
+.hero{padding:60px 0 44px;border-bottom:1px solid var(--line)}
+.wordmark{
+  font-family:var(--display);
+  font-weight:800;
+  font-size:clamp(3.2rem,10vw,6.4rem);
+  line-height:.94;
+  letter-spacing:.05em;
+  color:var(--ink);
+  margin:0 0 6px;
+}
+.wordmark em{font-style:normal;color:var(--blue)}
+.tuning{
+  font-family:var(--mono);font-size:.66rem;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--muted);margin:0 0 32px;
+}
+h1{
+  font-family:var(--sans);
+  font-weight:700;
+  font-size:clamp(1.6rem,3.6vw,2.45rem);
+  line-height:1.34;
+  letter-spacing:-.01em;
+  text-wrap:balance;
+  margin:0 0 20px;
+  max-width:15em;
+}
+.standfirst{font-size:1.03rem;line-height:1.9;color:var(--ink-soft);max-width:41em;margin:0 0 34px}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:0;border-top:1px solid var(--line)}
+.facts div{padding:15px 20px 2px 0;border-right:1px solid var(--line)}
+.facts div:last-child{border-right:0}
+.facts dt{font-family:var(--mono);font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.facts dd{margin:0;font-size:.89rem;line-height:1.55;color:var(--ink)}
+
+section{padding-top:62px}
+.eyebrow{
+  display:flex;align-items:center;gap:11px;
+  font-family:var(--mono);font-size:.66rem;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--blue);margin:0 0 14px;
+}
+.eyebrow::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--blue);flex:none}
+.eyebrow::after{content:"";flex:1;height:1px;background:var(--line);max-width:150px}
+h2{
+  font-family:var(--sans);font-weight:600;
+  font-size:clamp(1.3rem,2.5vw,1.75rem);
+  line-height:1.44;letter-spacing:-.005em;text-wrap:balance;
+  margin:0 0 22px;max-width:19em;
+}
+h3{font-family:var(--sans);font-size:1rem;font-weight:600;margin:0 0 9px;letter-spacing:.01em}
+
+.claim{display:grid;grid-template-columns:2px 1fr;gap:0 20px;margin-bottom:28px;max-width:calc(var(--measure) + 22px)}
+.claim-rule{background:var(--blue);border-radius:2px}
+.claim.warm .claim-rule{background:var(--seam)}
+.claim h3 span{
+  display:block;font-family:var(--mono);font-weight:400;
+  font-size:.64rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:5px;
+}
+
+figure{margin:32px 0 36px}
+.frame{
+  background:var(--surface);border:1px solid var(--line);border-radius:4px;
+  padding:22px 24px;overflow-x:auto;
+}
+figure svg{display:block;width:100%;min-width:660px;height:auto}
+figcaption{font-size:.82rem;line-height:1.75;color:var(--muted);margin-top:11px;max-width:44em}
+figcaption b{color:var(--ink-soft);font-weight:500}
+.svg-mono{font-family:var(--mono)}
+.svg-sans{font-family:var(--sans)}
+
+.tablewrap{overflow-x:auto;margin:26px 0 8px;border:1px solid var(--line);border-radius:4px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:620px;font-size:.87rem}
+th,td{text-align:left;padding:13px 18px;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.65}
+thead th{
+  font-family:var(--mono);font-size:.63rem;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--muted);font-weight:400;background:var(--sunk);
+}
+tbody tr:last-child td{border-bottom:0}
+td:first-child{font-weight:600;color:var(--ink);white-space:nowrap}
+td.who{white-space:normal;min-width:126px;line-height:1.5}
+td.who small{display:block;font-family:var(--mono);font-size:.67rem;color:var(--muted);font-weight:400;letter-spacing:.01em;margin-top:3px}
+.mark-us td{background:var(--blue-soft)}
+.mark-us td:first-child{color:var(--blue-ink)}
+
+.edges{display:grid;gap:0;margin:26px 0 0;border-top:1px solid var(--line)}
+.edge{padding:24px 0;border-bottom:1px solid var(--line);display:grid;grid-template-columns:auto 1fr;gap:0 22px}
+.edge-mark{
+  font-family:var(--display);font-size:1.4rem;font-weight:600;color:var(--blue);
+  line-height:1;padding-top:6px;
+}
+.edge h3{margin-bottom:8px}
+.edge p{margin-bottom:12px}
+.gap-ref{
+  display:inline-flex;align-items:baseline;gap:9px;flex-wrap:wrap;
+  font-family:var(--mono);font-size:.68rem;line-height:1.7;color:var(--seam);
+  background:var(--seam-soft);border-radius:3px;padding:6px 11px;
+}
+.gap-ref b{font-weight:400;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;font-size:.6rem}
+
+.roles{display:grid;grid-template-columns:repeat(auto-fit,minmax(238px,1fr));margin:26px 0 0;border-top:1px solid var(--line);border-left:1px solid var(--line)}
+.role{padding:20px 22px 22px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--surface)}
+.role-tag{font-family:var(--mono);font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;color:var(--blue);display:block;margin-bottom:8px}
+.role h3{margin-bottom:10px}
+.role p{font-size:.87rem;line-height:1.78;color:var(--ink-soft);margin:0 0 12px;max-width:none}
+.role dl{margin:0;font-size:.8rem;line-height:1.7}
+.role dt{font-family:var(--mono);font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+.role dd{margin:0 0 10px;color:var(--ink)}
+.role dd:last-child{margin-bottom:0}
+
+.fit{display:grid;grid-template-columns:1fr 1fr;gap:0;margin:30px 0 0;border:1px solid var(--line);border-radius:4px;overflow:hidden}
+.fit>div{padding:20px 22px;background:var(--surface)}
+.fit>div+div{border-left:1px solid var(--line);background:var(--sunk)}
+.fit h4{margin:0 0 12px;font-size:.72rem;font-family:var(--mono);letter-spacing:.16em;text-transform:uppercase;font-weight:400}
+.fit>div:first-child h4{color:var(--blue)}
+.fit>div+div h4{color:var(--seam)}
+.fit ul{margin:0;padding:0 0 0 17px;font-size:.87rem;line-height:1.82;color:var(--ink-soft)}
+.fit li{margin-bottom:6px}
+.fit li:last-child{margin-bottom:0}
+@media (max-width:620px){.fit{grid-template-columns:1fr}.fit>div+div{border-left:0;border-top:1px solid var(--line)}}
+
+.callout{
+  margin:30px 0 0;padding:18px 22px;
+  background:var(--seam-soft);border-left:2px solid var(--seam);border-radius:0 4px 4px 0;
+  max-width:calc(var(--measure) + 4em);
+}
+.callout b.lab{display:block;font-family:var(--mono);font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:var(--seam);margin-bottom:6px;font-weight:400}
+.callout p{font-size:.89rem;line-height:1.82;color:var(--ink-soft);margin:0;max-width:none}
+
+.stage{padding:36px 0;border-bottom:1px solid var(--line)}
+.stage:first-of-type{border-top:1px solid var(--line)}
+.stage-head{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:12px}
+.stage-num{font-family:var(--mono);font-size:.66rem;letter-spacing:.16em;color:var(--muted)}
+.stage-head h3{margin:0;font-size:1.06rem}
+.stage-lead{color:var(--ink-soft);font-size:.94rem;margin-bottom:20px;max-width:var(--measure)}
+
+.slot{
+  position:relative;
+  border:1px dashed var(--line-strong);
+  border-radius:4px;
+  background:var(--sunk);
+  aspect-ratio:16/9;
+  max-height:360px;
+  display:flex;flex-direction:column;justify-content:center;align-items:center;gap:7px;
+  text-align:center;padding:24px;
+}
+.slot::before,.slot::after{
+  content:"";position:absolute;width:9px;height:9px;
+  border:1px solid var(--blue);opacity:.55;
+}
+.slot::before{top:8px;left:8px;border-right:0;border-bottom:0}
+.slot::after{bottom:8px;right:8px;border-left:0;border-top:0}
+.slot-tag{
+  font-family:var(--mono);font-size:.6rem;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--blue);
+}
+.slot-name{font-size:1rem;font-weight:600;color:var(--ink)}
+.slot-spec{font-family:var(--mono);font-size:.68rem;line-height:1.8;color:var(--muted);max-width:32em}
+.tradeoff{
+  margin-top:16px;padding-left:18px;border-left:2px solid var(--blue);
+  font-size:.87rem;line-height:1.8;color:var(--ink-soft);max-width:40em;
+}
+.tradeoff b.lab{font-family:var(--mono);font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:4px;font-weight:400}
+
+.open{list-style:none;padding:0;margin:22px 0 0;max-width:calc(var(--measure) + 3em);border-top:1px solid var(--line)}
+.open li{padding:16px 0 16px 26px;border-bottom:1px solid var(--line);position:relative;font-size:.93rem;line-height:1.8}
+.open li::before{content:"";position:absolute;left:2px;top:29px;width:7px;height:7px;border-radius:50%;border:1.5px solid var(--seam)}
+
+.metrics{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+.metrics span{
+  font-family:var(--mono);font-size:.72rem;color:var(--ink-soft);
+  border:1px solid var(--line);border-radius:3px;padding:6px 11px;background:var(--surface);
+}
+
+.closing{
+  margin-top:66px;padding-top:24px;border-top:1px solid var(--line-strong);
+  font-family:var(--mono);font-size:.72rem;letter-spacing:.06em;color:var(--muted);line-height:1.95;
+  max-width:none;
+}
+
+@media (max-width:660px){
+  .page{padding:0 16px 80px}
+  body{font-size:15px}
+  .facts div{border-right:0;padding-right:0}
+  .edge,.claim{grid-template-columns:1fr;gap:8px}
+  .claim-rule{height:2px;width:40px}
+  .frame{padding:14px 12px}
+  .slot{aspect-ratio:4/3}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+:focus-visible{outline:2px solid var(--blue);outline-offset:3px}
+
+html{scroll-behavior:smooth;scroll-padding-top:90px}body{margin:0}p{max-width:43em}h2{max-width:28em}a{color:var(--blue-ink);text-underline-offset:4px}button{font:inherit;cursor:pointer}button,a{-webkit-tap-highlight-color:transparent}.page{max-width:1080px}.topbar{letter-spacing:.1em}.hero{padding:48px 0 34px}.hero-grid{display:grid;grid-template-columns:1.45fr 1fr;gap:38px;align-items:center}.hero h1{max-width:17em}.hero-note{padding:24px;background:var(--blue-soft);border:1px solid #cad9ff;border-radius:6px}.hero-note p{font-size:.88rem;line-height:1.85;margin:0 0 16px}.hero-note p:last-child{margin:0}.tiny{display:block;color:var(--blue);font:11px var(--mono);letter-spacing:.12em;margin-bottom:7px}.tuning{margin-bottom:24px}.standfirst{margin-bottom:22px}.facts{margin:30px 0 0}.facts div{padding-left:16px}.facts div:first-child{padding-left:0}.facts dt{font-size:.68rem}.navwrap{position:sticky;top:0;z-index:5;background:rgba(247,249,252,.98);border-bottom:1px solid var(--line)}.contents{display:flex;gap:4px;overflow:auto;padding:10px 0}.contents a{padding:7px 11px;font-size:.79rem;text-decoration:none;white-space:nowrap;border-radius:4px;color:var(--ink-soft)}.contents a:hover,.contents a[aria-current]{background:var(--blue-soft);color:var(--blue)}.reading-progress{position:absolute;bottom:-1px;left:0;height:2px;background:var(--blue);width:0}.badge{display:inline-block;font-size:.72rem;padding:3px 9px;border:1px solid var(--line-strong);border-radius:3px;color:var(--ink-soft);line-height:1.7}.badge.blue{background:var(--blue-soft);border-color:#cad9ff;color:var(--blue-ink)}.badge.warm{background:var(--seam-soft);border-color:#ecc8b9;color:var(--seam)}.muted{color:var(--muted);font-size:.83rem}.lead{font-size:1.02rem;color:var(--ink-soft)}.decision{border-left:2px solid var(--blue);padding:4px 0 4px 20px;margin:26px 0}.decision p{margin:0}.decision .lab{font:11px var(--mono);letter-spacing:.08em;color:var(--blue);display:block;margin-bottom:8px}.pair{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:24px 0}.panel{padding:22px;border:1px solid var(--line);background:white;border-radius:5px}.panel p{font-size:.89rem}.panel h3{font-size:1rem}.panel ul{padding-left:18px;margin:0;font-size:.87rem;color:var(--ink-soft)}.panel li+li{margin-top:8px}.evidence{font-size:.8rem;color:var(--muted);border-top:1px solid var(--line);padding-top:14px;margin-top:20px}.data-number{font:700 2.7rem var(--sans);line-height:1.2;letter-spacing:-.04em;color:var(--blue);display:block;margin:14px 0 10px}.data-number small{font-size:1rem;letter-spacing:0}.cite{font-size:.78em;white-space:nowrap}.capture{margin:24px 0 30px}.shot{display:block;position:relative;border:1px solid var(--line-strong);padding:0;width:100%;border-radius:5px;overflow:hidden;background:var(--sunk);text-align:left;box-shadow:0 10px 28px #2638580a}.shot img{display:block;width:100%;height:auto}.zoom{position:absolute;right:12px;bottom:12px;font-size:11px;background:var(--ink);color:white;padding:5px 10px;border-radius:3px}.shot:hover{border-color:var(--blue)}details{border:1px solid var(--line);border-radius:5px;background:white;margin:22px 0}summary{padding:17px 20px;cursor:pointer;font-size:.92rem;font-weight:600;color:var(--ink)}details[open] summary{border-bottom:1px solid var(--line)}.detail-body{padding:22px}.detail-body p{font-size:.9rem}.detail-body .tablewrap{margin:16px 0}.detail-body figure{margin-bottom:0}.tablewrap{margin-top:22px}table{font-size:.83rem}th,td{padding:13px 15px}thead th{font:500 .77rem var(--sans);letter-spacing:0}td:first-child{white-space:normal;min-width:115px}.tablewrap.wide table{min-width:780px}.tablewrap caption{text-align:left;padding:13px 15px;font-size:.79rem;color:var(--muted);background:var(--surface);caption-side:bottom;border-top:1px solid var(--line)}.flow{display:grid;grid-template-columns:1fr 30px 1fr 30px 1fr;align-items:center;margin:26px 0;gap:8px}.flow>div{border:1px solid var(--line);background:white;border-radius:4px;padding:18px}.flow>span{text-align:center;color:var(--blue)}.flow small{font:10px var(--mono);color:var(--blue);letter-spacing:.08em;display:block}.flow strong{font-size:.93rem}.flow p{font-size:.81rem;color:var(--ink-soft);margin:8px 0 0}.formula{padding:22px 24px;border:1px solid var(--line);border-radius:5px;background:white;margin:26px 0}.formula p{font-size:.88rem}.bars{display:grid;grid-template-columns:72px 1fr;gap:12px;align-items:center;margin-bottom:16px;font-size:.78rem}.bar{display:flex;height:30px;color:white;font-size:11px;line-height:30px;white-space:nowrap}.bar .work{background:var(--blue);text-align:center}.bar .handoff{background:var(--seam);text-align:center}.source-list{padding-left:23px;margin:18px 0 0;font-size:.85rem}.source-list li{padding:7px 0 9px 5px}.source-list p{margin:5px 0 0;color:var(--muted);font-size:.8rem}.step-label{font:11px var(--mono);color:var(--blue);letter-spacing:.1em;display:block;margin-bottom:8px}.stage{padding-top:30px}.roles{grid-template-columns:repeat(3,1fr)}.role p{font-size:.85rem}.open{max-width:none}.open li{font-size:.9rem}.open li strong{display:block;margin-bottom:4px}.closing{font-family:var(--sans);letter-spacing:0;font-size:.83rem;margin-top:48px}.closing p{max-width:none}.cta{display:inline-block;padding:10px 16px;background:var(--blue);color:white;border-radius:4px;text-decoration:none;font-size:.85rem}.text-link{display:inline-block;padding:10px 12px;font-size:.85rem}.skip{position:fixed;left:15px;top:-100px;z-index:30;background:white;padding:10px}.skip:focus{top:10px}.lightbox{max-width:min(1600px,96vw);width:96vw;padding:44px 14px 14px;border:0;border-radius:6px;background:var(--ground);max-height:94dvh}.lightbox::backdrop{background:#111318cc}.lightbox img{display:block;width:100%;height:auto}.lightbox-close{position:absolute;right:12px;top:8px;border:1px solid var(--line-strong);background:white;border-radius:3px;padding:3px 12px;font-size:.8rem}.lightbox-caption{font-size:.8rem;color:var(--ink-soft);margin:12px 0 0}.section-note{border-top:1px solid var(--line);padding-top:16px;margin-top:20px;color:var(--ink-soft);font-size:.9rem}.callout{max-width:none}.callout b.lab{font:12px var(--sans)}.todo-line{font-size:.84rem;padding:12px 0;color:var(--muted)}
+@media(max-width:760px){.hero-grid{grid-template-columns:1fr;gap:12px}.hero-note{padding:20px}.hero{padding-top:32px}.pair,.roles{grid-template-columns:1fr}.facts{grid-template-columns:1fr 1fr}.facts div{padding:14px 12px 4px 0;border:0}.flow{grid-template-columns:1fr}.flow>span{transform:rotate(90deg)}section{padding-top:44px}.contents a{padding:7px 10px}.page{padding-left:18px;padding-right:18px}.detail-body{padding:16px}.wordmark{font-size:4rem}.bar{font-size:10px}.bars{grid-template-columns:55px 1fr}.formula{padding:16px}.facts dd{font-size:.83rem}.lightbox{padding-left:5px;padding-right:5px}}
+@media print{.navwrap,.zoom,.skip,.lightbox,.cta,.text-link{display:none!important}.page{padding:0;max-width:none}body{font-size:10pt;background:white}.hero{padding-top:0}section{padding-top:26px}.capture,.panel,.flow,.formula,tr{break-inside:avoid}.shot{box-shadow:none}a{color:inherit}.hero-grid{grid-template-columns:1.5fr 1fr}}
+
+.source-list{display:grid;grid-template-columns:1fr 1fr;gap:6px 34px}.source-list li{break-inside:avoid}.lightbox-close{min-height:36px}.shot:focus-visible{outline:3px solid var(--blue);outline-offset:4px}
+@media(max-width:760px){.source-list{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
+.contract-demo{margin:30px 0 4px;padding:24px;background:var(--blue-soft);border:1px solid #cad9ff;border-radius:5px}.demo-head p{font-size:.84rem;color:var(--ink-soft);margin:8px 0 0}.demo-head h3{margin-top:12px}.contract-demo .pair{margin:18px 0}.artifact-fields{font-size:.83rem;margin:16px 0 0;display:grid;grid-template-columns:5em 1fr;gap:12px}.artifact-fields dt{color:var(--muted)}.artifact-fields dd{margin:0}.change-example{font-size:.84rem;max-width:none;margin:0}.contract-demo .panel{padding:18px}
+@media(max-width:760px){.contract-demo{padding:16px}.artifact-fields{grid-template-columns:1fr;gap:5px}.artifact-fields dd{margin-bottom:10px}}
+
+.problem-strip{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--line);background:white;border-radius:5px;margin:28px 0}.problem-strip>div{padding:24px}.problem-strip>div+div{border-left:1px solid var(--line);background:var(--seam-soft)}.problem-strip>div+div .tiny{color:var(--seam)}.problem-strip p{font-size:.88rem;color:var(--ink-soft)}.value-primary,.value-stability{padding:30px;border-radius:5px;margin:24px 0;background:var(--surface);border:1px solid var(--line)}.value-primary{background:var(--blue-soft);border-color:#c6d6ff;border-left:3px solid var(--blue)}.value-primary h3,.value-stability h3{font-size:1.22rem;line-height:1.6;margin:10px 0 15px}.value-index{font:11px var(--mono);letter-spacing:.08em;color:var(--blue);display:block;margin-bottom:10px}.value-outcome{padding-top:14px;border-top:1px solid var(--line);font-size:.88rem;color:var(--ink-soft);margin:18px 0 0}.value-primary p,.value-stability p{max-width:none}.stability-pair{display:grid;grid-template-columns:1fr 1fr;gap:20px;padding:20px;background:var(--sunk);margin:22px 0;border-radius:4px}.stability-pair p{font-size:.86rem;margin:5px 0 0}.value-secondary h3{margin-top:12px}.value-secondary .panel{display:flex;flex-direction:column}.value-secondary .value-outcome{margin-top:auto}.highlight{padding:30px 0 35px;border-bottom:1px solid var(--line)}.highlight>h3{font-size:1.18rem;line-height:1.5;margin:12px 0 15px}.highlight .capture{margin-bottom:20px}.highlight-takeaway{border-left:2px solid var(--blue);padding-left:18px;font-size:.88rem;color:var(--ink-soft);max-width:none}.choice-paths{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:24px}.choice-paths>div{padding:18px;background:var(--blue-soft);border:1px solid var(--line);border-radius:4px}.choice-paths p{font-size:.86rem;margin:8px 0 0}.demo-banner{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:24px;background:var(--blue-soft);border:1px solid #cad9ff;border-radius:4px;margin-top:28px}.demo-banner p{font-size:.86rem;color:var(--ink-soft)}.demo-banner .cta{white-space:nowrap;flex:none}.value-secondary p{margin-bottom:18px}.value-secondary .value-outcome{margin-bottom:0}.contents a{padding-left:12px;padding-right:12px}
+@media(max-width:760px){.problem-strip,.stability-pair,.choice-paths{grid-template-columns:1fr}.problem-strip>div+div{border-left:0;border-top:1px solid var(--line)}.value-primary,.value-stability{padding:21px}.demo-banner{align-items:flex-start;flex-direction:column}.value-primary h3,.value-stability h3{font-size:1.1rem}.problem-strip>div{padding:20px}}
+</style><link href="../assets/language.css" rel="stylesheet"/><script data-lang="zh" data-page="intro" defer="True" src="../assets/language.js"></script></head><body><a class="skip" href="#main">跳到正文</a><div class="page"><div class="topbar"><span><b>BASE</b> · Agent 工作台</span><span>产品设计案例 / 2026.09</span></div><header class="hero" id="top"><div class="hero-grid"><div><p class="wordmark">BA<em>S</em>E</p><p class="tuning">[ 企业岗位 Agent 工作台 · 产品原型 ]</p><h1>把个人提效，<br/>变成组织提效。</h1><p class="standfirst">BASE 将岗位需要的经验、资料、工具和工作方式沉淀为可复用、可定制的 Agent，再通过项目空间连接不同角色的工作，让个人积累能够持续服务于组织。</p><a class="cta demo-link" href="prototype.html" rel="noopener" target="_blank">查看原型 ↗</a><a class="text-link" href="#product">看三个设计亮点 ↓</a></div><aside aria-label="项目速览" class="hero-note"><p><span class="tiny">01 / 起点</span><strong>个人快了，组织没快。</strong><br/>工具提升了岗位内效率，协作与经验传承仍然存在断点。</p><p><span class="tiny">02 / 价值</span><strong>提效，也让岗位工作更稳定。</strong><br/>兼顾组织协作、经验延续、企业管理与员工日常使用。</p><p><span class="tiny">03 / 方案</span><strong>模板复用 + 岗位定制 + 项目协作。</strong><br/>以产研场景展示企业岗位工作台的产品思路。</p></aside></div><dl class="facts"><div><dt>我的工作</dt><dd>问题判断 · 产品定位<br/>竞品分析 · 原型设计</dd></div><div><dt>面向用户</dt><dd>企业内不同岗位的员工<br/>业务建设者与管理者</dd></div><div><dt>核心价值</dt><dd>组织提效 · 岗位稳定<br/>企业管理 · 个人提效</dd></div><div><dt>当前阶段</dt><dd>可交互原型，未上线<br/>探索 DeepSeek Harness 接入</dd></div></dl></header><div class="navwrap"><nav aria-label="页面目录" class="contents"><a href="#problem">01 问题</a><a href="#value">02 核心价值</a><a href="#reasoning">03 产品推导</a><a href="#research">04 竞品判断</a><a href="#product">05 设计亮点</a><a href="#technology">06 技术思路</a><a href="#next">07 后续思考</a></nav><div aria-hidden="true" class="reading-progress"></div></div><main id="main"><section aria-labelledby="problem-title" id="problem"><p class="eyebrow">01 / 从实际工作出发</p><h2 id="problem-title">个人快了，组织没快。</h2>
+<p class="lead">这是我在实际工作中的核心判断：<strong>员工已经通过很多 AI 工具提升了个人效率，但组织整体并没有随之提高。</strong></p>
+<p>公司里并不缺少使用 AI 的方式。有人用办公助手处理日常事务，有人用工作流完成重复任务，也有人借助开发工具搭建自己的 Agent。个人可以更快地产出一份分析、一版原型或一段代码，但这些改善没有自然汇集成组织的整体提升。</p>
+<div class="problem-strip"><div><span class="tiny">岗位内部</span><h3>每个人做自己的事更快了</h3><p>资料检索、内容生成、设计开发、重复操作，都有了新的提效工具。</p></div><div><span class="tiny">岗位之间</span><h3>工作仍靠人反复连接</h3><p>上下文要重新解释，成果要重新整理，判断标准要重新对齐，相似能力仍被重复搭建。</p></div></div>
+<p>我因此把关注点从“怎样让更多人用上 AI”，转向<strong>“怎样让一个人的提效，能够被上下游接住，并持续沉淀下来”</strong>。组织提效需要同时处理协作中的信息损耗、重复建设和经验传承。</p>
+<div class="decision"><span class="lab">BASE 首先要回答的问题</span><p><strong>怎样把分散在员工手里的 AI 能力，组织成可以共同使用、持续维护、跨岗位协作的工作系统？</strong>这也是后续模板、岗位自定义与项目空间设计的出发点。</p></div>
+</section><section aria-labelledby="value-title" id="value"><p class="eyebrow">02 / 核心价值</p><h2 id="value-title">四项价值，以组织提效为中心</h2>
+<article class="value-primary"><span class="value-index">01 / 核心价值</span><h3>组织提效：让个人成果成为上下游可继续使用的输入</h3><p>把岗位 Context、工作方法、交付物与任务状态放到共同的工作空间里，让不同角色围绕同一业务目标协作。前一环节的产出能够直接进入下一环节，成熟的方法能够被其他人复用，减少重复搭建、反复对齐和因信息缺失产生的返工。</p><p class="value-outcome"><strong>关注的变化：</strong>从“每个人更快完成自己的部分”，走向“整个团队更顺畅地完成一件事”。</p></article>
+<article class="value-stability"><span class="value-index">02 / 企业稳定性</span><h3>岗位稳定：人员变化后，工作仍能延续</h3><p>同一个岗位换人接手，前人的材料、判断经验和工作习惯往往没有完整留下。新人需要重新摸索，产出也容易随个人经验出现波动。</p><p>BASE 希望把这些积累组织进岗位 Agent：业务背景、历史案例、常用模板、工具、工作流程，以及什么算“做好”的判断标准。新员工接手的是一套可以继续使用和完善的工作基础。</p><div class="stability-pair"><div><strong>上手阶段</strong><p>更快找到岗位资料，理解工作方法，沿着已有范例完成任务。</p></div><div><strong>长期使用</strong><p>在历史经验与持续更新的规则支持下工作，减少反复试错，提高长期效率与产出稳定性。</p></div></div><p class="value-outcome"><strong>要沉淀的不是某个人的全部判断，而是可维护的方法、依据与经验。</strong>负责人仍需要校准规则，让岗位资产跟随业务变化。</p></article>
+<div class="pair value-secondary"><article class="panel"><span class="value-index">03 / 企业管理</span><h3>让 AI 投入可见、可管、可判断</h3><p>企业需要知道哪些 Agent 在服务什么业务、由谁维护、谁能使用、消耗多少资源、效果如何。统一管理资产归属、权限、版本和运行信息，才能判断哪些能力值得继续投入和推广。</p><p class="value-outcome"><strong>关注的变化：</strong>从分散的个人账号与配置，走向有责任、有边界的组织资产。</p></article><article class="panel"><span class="value-index">04 / 员工个人提效</span><h3>从现成能力开始，按岗位需要调整</h3><p>员工既可以直接使用适合自己的 Agent 模板，也可以补充业务资料、调整工作方式。不必人人从零搭建，就能更快完成日常分析、写作、检索、设计和重复任务。</p><p class="value-outcome"><strong>关注的变化：</strong>降低使用与建设门槛，让已有能力真正进入每天的工作。</p></article></div>
+<p class="section-note"><strong>四项价值是相互支撑的：</strong>个人用得顺，能力才会被持续使用；经验能沉淀，岗位才更稳定；资产可管理，复用才有边界；不同岗位连接起来，才有机会形成组织提效。</p>
+</section><section aria-labelledby="reasoning-title" id="reasoning"><p class="eyebrow">03 / 从价值到产品</p><h2 id="reasoning-title">为什么最终做成岗位 Agent 工作台</h2>
+<p>沿着这些需求，我的思考从共享单个 Skill，逐步走到可复用的岗位模板，再走到项目中的多角色协作。</p>
+<div class="edges"><article class="edge"><div class="edge-mark">01</div><div><h3>先共享方法，再补齐方法运行所需的业务上下文</h3><p>共享 Skill 可以减少重复建设，但方法要在岗位上持续有效，还需要领域资料、历史范例、输出标准和工具。于是，我把复用的对象从一段方法扩展为一套岗位工作基础。</p></div></article><article class="edge"><div class="edge-mark">02</div><div><h3>用模板承载共性，用自定义适配岗位差异</h3><p>同样叫“产品经理 Agent”，不同团队需要的输入、判断口径和产物可能不同。直接共享完整的个人 Agent，未必能被其他岗位接住。更合理的方式是<strong>共享可复用的模板，让使用者基于模板完成业务适配。</strong></p></div></article><article class="edge"><div class="edge-mark">03</div><div><h3>自定义覆盖工作方式，再通过项目把岗位连接起来</h3><p>有的任务需要不断澄清，有的适合定时采集与审核，有的需要画布或代码工作区。自定义因此不能只停在 Context，还要覆盖工具、执行和交互。最后，让这些岗位围绕同一项目资料与交付要求协作，才能从个人提效走向组织提效。</p></div></article></div>
+<div class="flow"><div><small>可复用模板</small><strong>建设者沉淀共性</strong><p>通用方法、默认组件、工具配置和产出规范。</p></div><span aria-hidden="true">→</span><div><small>岗位实例</small><strong>使用者直接用或定制</strong><p>绑定本岗位资料，调整所需能力与工作方式。</p></div><span aria-hidden="true">→</span><div><small>项目协作</small><strong>不同岗位共同推进</strong><p>共享交付物、对齐进度、保留决策与确认。</p></div></div>
+<div class="decision"><span class="lab">复用不是直接复制所有内容</span><p>模板共享共性，岗位实例保留业务差异；团队私有资料和访问权限不会因为共享模板而一起传播。<strong>可复用的工作结构，与适合共享的业务内容，需要分别管理。</strong></p></div>
+</section><section aria-labelledby="research-title" id="research"><p class="eyebrow">04 / 竞品分析后的判断</p><h2 id="research-title">现成工具提供能力，BASE 组织岗位的使用方式</h2>
+<p>从 WorkBuddy、千问办公、豆包工作以及 Dify 等产品中，我看到专家角色、技能复用、企业上下文、自动化与人工审核已经在发展。BASE 的重点因此落在：如何围绕企业岗位，把这些能力组织成可使用、可维护、可协作的工作方式。</p>
+<div class="tablewrap"><table><thead><tr><th>参照方案</th><th>值得借鉴的部分</th><th>对 BASE 的启发</th></tr></thead><tbody><tr><td>WorkBuddy</td><td>专家与专家团，把专业角色和协作方式变成可调用的能力。</td><td>用模板降低上手门槛，同时让具体岗位能够调整资料、方法与交付要求。</td></tr><tr><td>千问办公</td><td>结合办公生态，提供技能、连接器、定时任务和企业管理入口。</td><td>把日常任务与自动运行结合起来，让管理与使用处于同一体系。</td></tr><tr><td>豆包工作</td><td>结合企业知识与用户权限，成果可回到协作平台继续使用。</td><td>岗位 Agent 要能接住组织已有的上下文，并把新成果继续沉淀回去。</td></tr><tr><td>Dify</td><td>流程编排与人工输入节点，可将审核和分支纳入执行过程。</td><td>确定步骤可以交给工作流；业务用户仍需要适合岗位任务的交互入口。</td></tr></tbody></table></div>
+<p class="section-note"><strong>我更关注组合后的实际价值：</strong>员工是否容易使用，岗位是否能持续维护，成果是否能被上下游复用。现有平台能承接的能力可以接入，BASE 集中处理岗位配置、资产关系和协作体验。</p>
+</section><section aria-labelledby="product-title" id="product"><p class="eyebrow">05 / 三个设计亮点</p><h2 id="product-title">可复用、可定制，也能一起工作</h2><p class="lead">原型围绕三个重点展开：让能力能够复用，让工作方式可以定制，让不同岗位能够围绕项目协作。完整交互可以进入 Demo 查看。</p><div class="highlight"><span class="step-label">亮点 01 / 模板与自定义</span><h3>一个人搭好模板，其他岗位从已有积累开始</h3><p>建设者先把专业方法、工具和默认工作区沉淀为 Agent 模板。使用者找到适合自己的模板后，可以按现有配置直接使用，也可以创建适合本岗位的版本，补充资料、调整报告形式与能力组件。</p><div class="choice-paths"><div><strong>直接使用</strong><p>选择适合任务的模板 → 接入必要资料与授权 → 开始工作。</p></div><div><strong>基于模板定制</strong><p>保留通用骨架 → 调整岗位配置 → 预览、试用并保存自己的实例。</p></div></div><figure class="capture"><button aria-label="放大查看：Agent 模板 · 从可用能力开始" class="shot" type="button"><img alt="Agent 模板 · 从可用能力开始，BASE 原型画面。" height="1000" loading="lazy" src="../assets/market-zh.png" width="1440"/><span class="zoom">↗ 放大查看</span></button><figcaption><b>Agent 模板 · 从可用能力开始</b> · 模板提供起点，岗位使用者保留适配空间。</figcaption></figure><p class="highlight-takeaway"><strong>设计重点：</strong>把“使用”与“建设”分开，让员工不必先理解所有底层配置，也能开始完成工作。</p></div><div class="highlight"><span class="step-label">亮点 02 / 可配置的工作方式</span><h3>自定义覆盖 Context，也覆盖 Agent 怎样工作</h3><p>Context Engineering 让 Agent 获得合适的业务依据。基于 DeepSeek Harness 的组件化思路，还可以进一步配置模型、工具和执行方式，并由工作台提供对应的交互。岗位差异因此能够落实到实际运行方式上。</p><figure class="capture"><button aria-label="放大查看：建设模式 · 配置与预览一起呈现" class="shot" type="button"><img alt="建设模式 · 配置与预览一起呈现，BASE 原型画面。" height="1000" loading="lazy" src="../assets/builder-zh.png" width="1440"/><span class="zoom">↗ 放大查看</span></button><figcaption><b>建设模式 · 配置与预览一起呈现</b> · 当前原型展示组件组合与配置；运行能力通过 Harness 与业务服务逐项接入。</figcaption></figure><div class="tablewrap"><table><thead><tr><th>可定制方向</th><th>岗位使用者或建设者可以改变什么</th></tr></thead><tbody><tr><td>Context 与岗位规范</td><td>业务资料、规则、历史范例、Skill、输出结构和验收要求。</td></tr><tr><td>工具与数据能力</td><td>选择检索、文件处理、数据采集或业务连接器，并配置可访问的范围。</td></tr><tr><td>模型与执行方式</td><td>按任务选择模型和能力组合；需要时在单任务内部增加分工与检查步骤。</td></tr><tr><td>触发与交互</td><td>手动发起、定时运行或事件触发；对话、表格、画布与审核队列配合任务使用。</td></tr><tr><td>历史与反馈</td><td>决定保留哪些任务记录、引用哪些历史产物，以及如何收集修改和退回原因。</td></tr></tbody></table></div><p class="highlight-takeaway"><strong>设计重点：</strong>配置先生成可预览的草稿，试用后保存；涉及共享规则、工具权限与新增代码的变化，需要对应负责人确认。</p></div><div class="highlight"><span class="step-label">亮点 03 / 项目空间</span><h3>让岗位之间的工作，围绕同一份项目资产延续</h3><p>项目空间把目标、任务、资料、交付物和人工节点放在一起。不同角色进入自己的岗位工作台，也能理解上游产出了什么、当前轮到谁处理、下游需要什么。</p><figure class="capture"><button aria-label="放大查看：项目空间 · 岗位、任务与资产相连" class="shot" type="button"><img alt="项目空间 · 岗位、任务与资产相连，BASE 原型画面。" height="1000" loading="lazy" src="../assets/project-zh.png" width="1440"/><span class="zoom">↗ 放大查看</span></button><figcaption><b>项目空间 · 岗位、任务与资产相连</b> · 以产研协作为例，呈现共享资料、进度和人工确认节点。</figcaption></figure><p>例如，需求洞察整理出的需求与验收标准，可以成为原型设计的输入；设计方案与约束继续进入研发任务。关键是约定输入输出、保留交付版本和确认人，而不只是把多个 Agent 画在一张图上。</p><p class="highlight-takeaway"><strong>设计重点：</strong>工作在岗位间流转，依据与决策也随之保留；项目成员能够在已有成果上继续推进。</p></div><div class="demo-banner"><div><h3>进入 BASE，体验完整工作台</h3><p>模板选择、岗位定制与项目协作，都可以在 Demo 中查看。</p></div><a class="cta demo-link" href="prototype.html" rel="noopener" target="_blank">查看原型 ↗</a></div></section><section aria-labelledby="technology-title" id="technology"><p class="eyebrow">06 / 技术思路</p><h2 id="technology-title">让岗位差异能够落到可替换的组件上</h2>
+<p>DeepSeek Harness 的插件化架构，使模型适配、工具注册、会话日志和执行循环可以按配置组合。对 BASE 来说，它提供的是按岗位组装运行能力的基础：共用底座，同时允许不同岗位采用不同的能力配置。</p>
+<div class="flow"><div><small>BASE 体验层</small><strong>把配置变成可理解的界面</strong><p>模板、岗位工作区、配置预览、项目空间与审核入口。</p></div><span aria-hidden="true">↔</span><div><small>岗位与项目服务</small><strong>管理业务关系和边界</strong><p>资料归属、角色权限、配置版本、任务依赖与产物确认。</p></div><span aria-hidden="true">↔</span><div><small>HARNESS 运行层</small><strong>组合并执行 Agent 能力</strong><p>模型、工具、上下文装配、执行过程与会话记录。</p></div></div>
+<p>这里需要区分三种变化：<strong>模型、工具与运行逻辑</strong>映射到 Harness 配置；<strong>卡片布局、画布与审核视图</strong>由 BASE 前端组件实现；<strong>组织权限、版本发布与后台调度</strong>由业务服务配合。它们共同决定岗位工作方式，而不是一个框架自动完成所有产品能力。</p>
+<div class="decision"><span class="lab">补齐经验沉淀的闭环</span><p><strong>个人使用与定制 → 记录问题和改进 → 建设者归纳共性 → 试用与审核 → 发布模板新版本。</strong>个人修改先留在自己的实例中；经过检验的共性才进入共享模板，让员工的积累反过来帮助其他岗位。</p></div>
+<p class="muted">当前为交互原型。组件配置、项目关系与操作路径已经用于演示；团队权限、可靠调度和完整运行闭环属于后续实现范围。</p>
+</section><section aria-labelledby="next-title" id="next"><p class="eyebrow">07 / 继续完善的部分</p><h2 id="next-title">从岗位能用，到组织持续受益</h2>
+<div class="pair"><article class="panel"><h3>谁负责让岗位资产一直可用？</h3><p>使用者提供反馈，领域建设者维护方法与模板，业务负责人确认标准，管理者负责权限和运行。人员接手时，资料、配置和维护责任应一并交接。</p></article><article class="panel"><h3>模板什么时候需要拆分或升级？</h3><p>资料、输出格式和组件不同，优先通过配置解决；目标、验收标准或权限长期冲突，再拆成不同模板。共享模板升级要让使用者看懂变化，并保留现有实例的可用性。</p></article><article class="panel"><h3>哪些环节仍需要人的判断？</h3><p>有明确标准的重复工作适合自动执行；目标取舍、关键验收和有外部影响的动作保留确认。审核要突出差异和异常，避免成为新的等待环节。</p></article><article class="panel"><h3>怎样判断组织真的受益？</h3><p>优先沿一条真实业务链记录交接、返工和重复建设；同时检查岗位接手与长期使用情况。个人省下的时间，要与审核、配置和维护投入一起计算。</p></article></div>
+<div class="tablewrap"><table><thead><tr><th>对应价值</th><th>后续重点观察</th></tr></thead><tbody><tr><td>组织提效</td><td>端到端交付周期、信息导致的返工、重复搭建与反复对齐是否减少。</td></tr><tr><td>岗位稳定</td><td>新人独立承担任务所需时间、接手后的交付质量，以及持续使用中的修订与返工。</td></tr><tr><td>企业管理</td><td>资产是否有维护者，权限与版本是否清楚，投入和使用效果能否关联。</td></tr><tr><td>个人提效</td><td>完成任务所需的净投入，包括使用、审核、定制和维护，而非只看生成速度。</td></tr></tbody></table></div>
+<p class="section-note">产研协作是当前展示与试跑的入口。后续应由真实业务需求决定推广顺序：先让岗位用得起来、经验留得下来，再把成熟的能力连进更多组织流程。</p>
+</section></main><footer class="closing"><p><strong>BASE · 企业岗位 Agent 工作台</strong><br/>让个人的提效与经验，成为组织可以持续使用的能力。</p><p>产品原型 · 未上线</p><a href="#top">回到开头 ↑</a></footer></div><dialog aria-label="原型截图放大预览" class="lightbox"><button class="lightbox-close" type="button">关闭 ×</button><img alt=""/><p class="lightbox-caption"></p></dialog><script>
+const dialog=document.querySelector('.lightbox');let lastShot=null;
+document.querySelectorAll('.shot').forEach(button=>button.addEventListener('click',()=>{lastShot=button;const img=button.querySelector('img');dialog.querySelector('img').src=img.src;dialog.querySelector('img').alt=img.alt;dialog.querySelector('.lightbox-caption').textContent=button.parentElement.querySelector('figcaption').textContent;dialog.showModal();}));
+dialog.querySelector('button').addEventListener('click',()=>dialog.close());dialog.addEventListener('click',e=>{if(e.target===dialog){const r=dialog.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)dialog.close()}});dialog.addEventListener('close',()=>lastShot?.focus());
+const navLinks=[...document.querySelectorAll('.contents a')],sections=[...document.querySelectorAll('main>section')];let scheduled=false;function updateReading(){scheduled=false;const max=document.documentElement.scrollHeight-innerHeight;document.querySelector('.reading-progress').style.width=(max>0?scrollY/max*100:0)+'%';let current=sections[0];for(const s of sections)if(s.getBoundingClientRect().top<150)current=s;for(const a of navLinks){if(a.hash==='#'+current.id)a.setAttribute('aria-current','location');else a.removeAttribute('aria-current')}}addEventListener('scroll',()=>{if(!scheduled){scheduled=true;requestAnimationFrame(updateReading)}},{passive:true});addEventListener('resize',updateReading);updateReading();let printState=[];addEventListener('beforeprint',()=>{printState=[...document.querySelectorAll('details')].map(d=>[d,d.open]);printState.forEach(([d])=>d.open=true)});addEventListener('afterprint',()=>printState.forEach(([d,open])=>d.open=open));
+</script></body></html>
